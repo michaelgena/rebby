@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "828742617778",
+    "firebase_url": "https://rebby-186b7.firebaseio.com",
+    "project_id": "rebby-186b7",
+    "storage_bucket": "rebby-186b7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:828742617778:android:573310da68c0cf2d",
+        "android_client_info": {
+          "package_name": "com.dailyglancer.Rebby"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "828742617778-iljep334tsaij23h9si12ohpmuc8q0vr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dailyglancer.Rebby",
+            "certificate_hash": "50192827608F15F3889E9200600FF8F94CDDB508"
+          }
+        },
+        {
+          "client_id": "828742617778-g7r9fqh7dkq5a17o69a64v65l8goiate.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwkjzYp5JvAidVBetmeY5fX4vi2oVX-H4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "828742617778-g7r9fqh7dkq5a17o69a64v65l8goiate.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,40 @@
+{
+  "name": "Rebby",
+  "version": "0.0.1",
+  "private": true,
+  "author": "Dailyglancer (http://www.dailyglancer.com/)",
+  "contributors": [
+    {
+      "name": "Michael Gena",
+      "email": "michael@dailyglancer.com"
+    }
+  ],
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/michaelgena/rebus",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/michaelgena/rebus.git"
+  },
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "ios": "node node_modules/react-native/local-cli/cli.js run-ios",
+    "android": "node node_modules/react-native/local-cli/cli.js run-android"
+  },
+  "dependencies": {
+    "react": "^15.2.0",
+    "react-native": "^0.30.0",
+    "react-native-button": "^1.7.0",
+    "react-native-clipboard": "0.0.5",
+    "react-native-contacts": "^0.5.1",
+    "react-native-keyboard-aware-scroll-view": "^0.2.0",
+    "react-native-loading-spinner-overlay": "^0.3.0",
+    "react-native-message-bar": "^1.6.0",
+    "react-native-realtimemessaging-android": "^1.1.2",
+    "react-native-realtimemessaging-ios": "^1.0.16",
+    "react-native-share": "^1.0.13",
+    "react-native-simple-radio-button": "^2.4.0",
+    "react-native-social-share": "^0.8.0",
+    "react-native-telephone-input": "^1.0.0",
+    "react-native-vector-icons": "^2.1.0"
+  }
+}
