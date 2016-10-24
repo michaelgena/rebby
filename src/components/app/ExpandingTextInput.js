@@ -105,13 +105,13 @@ var styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderColor: 'transparent',
     color: 'transparent',
-    padding: 10,
+    padding: 0,
     fontSize: 15
   },
   input: {
-    padding: 10,
+    padding: 0,
     flex: 1,
-    fontSize: 18
+    fontSize: 15
   }
 });
 

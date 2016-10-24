@@ -137,7 +137,6 @@ class ChatList extends Component {
 
 	constructor(props) {
     super(props);
-
      this.state = {
      		isLoading: true,
         reloading: false,
@@ -161,10 +160,8 @@ class ChatList extends Component {
     if (this.state.isLoading) {
          return this.renderLoadingView();
     }
-
     if (Platform.OS === 'android'){
       return (
-
           <View style={{flex: 1}}>
             <Icon.ToolbarAndroid style={styles.toolbar}
                     title="Home"
@@ -231,7 +228,7 @@ class ChatList extends Component {
     chat = chat.replace(/\\"/g , "\"");
     var rebChat = JSON.parse(chat);
 		return (
-  		<TouchableHighlight onPress={ () => this.navRebChat(rebChat)}>
+  		<TouchableHighlight onPress={ () => this.navRebChat(rebChat)} underlayColor="#FFFFFF">
 					<View style={{flex:1, flexDirection: 'row',}}>
               <View style={{paddingLeft: 10, paddingRight: 5, paddingTop: 10}}>
                 <Icon name="ios-contact" size={80} color="#CCCCCC"/>
@@ -300,7 +297,7 @@ class ChatList extends Component {
       id: 'rebChat',
       title: rebChat.givenName,
       component: RebChat,
-      passProps: {givenName:rebChat.givenName},
+      passProps: {givenName:rebChat.givenName, channel:rebChat.channel},
     })
   }
   navNewReb(){

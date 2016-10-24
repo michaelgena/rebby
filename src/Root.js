@@ -10,6 +10,7 @@ import RealtimeRCT from './components/app/RealtimeRCT';
 import RealtimeRCTAndroid from './components/app/RealtimeRCTAndroid';
 import ChatList from './components/app/ChatList';
 import Contacts from './components/app/Contacts';
+import Settings from './components/app/Settings';
 
 class Root extends Component{
 
@@ -66,7 +67,7 @@ class Root extends Component{
         style={styles.container}
         initialRoute={{
           title: 'Settings',
-          component: RealtimeRCT,
+          component: Settings,
           passProps: this.props
         }}
         itemWrapperStyle={styles.itemWrapper}
@@ -166,8 +167,8 @@ class Root extends Component{
         return (<NewReb navigator={navigator} title="New" {...route.passProps}/>);
       case 'reb':
         return (<Reb navigator={navigator} title="Reb" {...route.passProps}/>);
-      case 'realtimeRCT':
-          return (<RealtimeRCTAndroid navigator={navigator} title="RealtimeRCT" {...route.passProps}/>);
+      case 'settings':
+          return (<Settings navigator={navigator} title="Settings" {...route.passProps}/>);
       case 'chatList':
           return (<ChatList navigator={navigator} title="Chats" {...route.passProps}/>);
       case 'contacts':

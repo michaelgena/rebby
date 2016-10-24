@@ -484,7 +484,7 @@ class RebList extends Component {
     }
     if(toolbarActions[position].title == "Settings"){
       this.props.navigator.push({
-        id: 'realtimeRCT'
+        id: 'settings'
       })
     }
   }

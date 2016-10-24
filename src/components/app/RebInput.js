@@ -6,19 +6,14 @@ import Button from 'react-native-button';
 import dismissKeyboard from 'dismissKeyboard';
 var ExpandingTextInput = require("./ExpandingTextInput");
 var Clipboard = require('react-native-clipboard');
-import Radio, {RadioButton} from 'react-native-simple-radio-button';
 var KDSocialShare = require('NativeModules').KDSocialShare;
-
 var MessageBarAlert = require('react-native-message-bar').MessageBar;
 var MessageBarManager = require('react-native-message-bar').MessageBarManager;
-
 import Icon from 'react-native-vector-icons/Ionicons';
-//import Toggle from 'react-native-toggle';
-
 import realtimeIOS from '../../../RCTRealtimeMessagingIOS';
-
 var RCTRealtimeMessaging;
-//RCTRealtimeMessaging = new realtimeIOS();
+import NotificationHandler from './NotificationHandler';
+var notificationHandler = new NotificationHandler();
 
 var dataEN = require("../../data/EN.js");
 var dataFR = require("../../data/FR.js");
@@ -49,11 +44,6 @@ function clone(obj) {
     throw new Error("Unable to copy obj! Its type isn't supported.");
 }
 
-var radio_props = [
-  {label: 'EN', value: 0 },
-  {label: 'FR', value: 1 }
-];
-
 class RebInput extends Component {
 
   constructor(props) {
@@ -77,18 +67,19 @@ class RebInput extends Component {
        previousText:this.props.text != null ? this.props.text : "",
        currentText:this.props.text != null ? this.props.text : "",
        rebusArray:[],
-       language:this.props.language != null ? this.props.language : 0,
+       language:this.props.language != null ? this.props.language : "EN",
        height: new Animated.Value(this.viewMaxHeight),
        done: false,
+       buttonLabel:props.buttonLabel != null ? props.buttonLabel : "Done",
        suggest1:{},
        suggest2:{},
        suggest3:{},
-
        channel: props.channel
     };
   }
 
   componentDidMount() {
+    notificationHandler.doConnect();
   }
 
   doSendMessage(message){
@@ -153,6 +144,17 @@ class RebInput extends Component {
         }).done();
       }
   }
+  switchLanguage(){
+    if(this.state.language === "EN"){
+      this.setState({
+          language: "FR"
+      });
+    }else if(this.state.language === "FR"){
+      this.setState({
+          language: "EN"
+      });
+    }
+  }
 
   inputFocused() {
     this.setState({
@@ -196,7 +198,6 @@ class RebInput extends Component {
   }
 
   shareOnFacebook() {
-
     KDSocialShare.shareOnFacebook({
         'text':this.state.rebus,
         'link':'',
@@ -259,11 +260,11 @@ class RebInput extends Component {
                 </View>
               </ScrollView>
             <View style={styles.textInputContainer}>
-              <Radio
-                radio_props={radio_props}
-                initial={this.state.language}
-                onPress={(value) => {this.setState({language:value})}}
-              />
+              <Button
+                style={styles.sendButton}
+              >
+              {this.state.language}
+              </Button>
               <ExpandingTextInput
                 value={this.state.text}
                 onChangeText={(text) => this.setState({text})}
@@ -314,11 +315,11 @@ class RebInput extends Component {
                 </View>
               </ScrollView>
             <View style={styles.textInputContainer}>
-              <Radio
-                radio_props={radio_props}
-                initial={this.state.language}
-                onPress={(value) => {this.setState({language:value})}}
-              />
+            <Button
+              style={styles.sendButton}
+            >
+            {this.state.language}
+            </Button>
               <ExpandingTextInput
                 controlled={true}
                 placeholder="Your text here..."
@@ -362,12 +363,12 @@ class RebInput extends Component {
             </ScrollView>
             <View style={styles.textPlaceContainer}>
               <View style={styles.textInputContainer}>
-                <Radio
-                  radio_props={radio_props}
-                  initial={this.state.language}
-                  onPress={(value) => {this.setState({language:value})}}
-                />
-
+                <Button
+                  style={styles.sendButton}
+                  onPress={this.switchLanguage.bind(this)}
+                >
+                {this.state.language}
+                </Button>
                 <ExpandingTextInput
                   value={this.state.text}
                   onChangeText={(text) => {this.setState({text});this.generate(this.state.text)}}
@@ -381,7 +382,7 @@ class RebInput extends Component {
                   style={styles.sendButton}
                   onPress={this.buttonClicked.bind(this)}
                 >
-                Done
+                {this.state.buttonLabel}
                 </Button>
               </View>
             </View>
@@ -414,11 +415,12 @@ class RebInput extends Component {
             </ScrollView>
             <View style={styles.textPlaceContainer}>
               <View style={styles.textInputContainer}>
-                <Radio
-                  radio_props={radio_props}
-                  initial={this.state.language}
-                  onPress={(value) => {this.setState({language:value})}}
-                />
+                <Button
+                  style={styles.sendButton}
+                  onPress={this.switchLanguage.bind(this)}
+                >
+                {this.state.language}
+                </Button>
                 <ExpandingTextInput
                   value={this.state.text}
                   onChangeText={(text) => {this.setState({text});this.generate(this.state.text)}}
@@ -432,7 +434,7 @@ class RebInput extends Component {
                   style={styles.sendButton}
                   onPress={this.buttonClicked.bind(this)}
                 >
-                Done
+                {this.state.buttonLabel}
                 </Button>
               </View>
               <View style={styles.suggestions}>
@@ -625,7 +627,7 @@ class RebInput extends Component {
     if(/^[A-Za-z\u00C0-\u017F]+$/.test(char)){
       char = char.latinize();
       var foundMatch = false;
-      var json = this.state.language == 1 ? jsonFR : jsonEN;
+      var json = this.state.language == "FR" ? jsonFR : jsonEN;
       for(var j = 0; j < json[char].length; j++){
         if(json[char][j].name.startsWith(obj.word.toLowerCase().latinize()) == true){
             //are we building the rebus on the go
@@ -780,8 +782,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 1 / PixelRatio.get(),
     flexDirection: 'row',
     backgroundColor: '#FFF',
-    paddingLeft: 10,
-    paddingRight: 10
+    paddingLeft: 5,
+    paddingRight: 5
   },
 
   textPlaceContainer: {
@@ -805,20 +807,11 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     flexDirection: 'row',
   },
-  textInput: {
-    alignSelf: 'center',
-    height: 30,
-    width: 200,
-    backgroundColor: '#FFF',
-    flex: 1,
-    padding: 0,
-    margin: 0,
-    fontSize: 15,
-  },
   sendButton: {
     alignSelf: 'flex-end',
-    marginTop: 8,
-    marginLeft: 5,
+    marginTop: 3,
+    marginRight: 5,
+    marginLeft: 2,
   },
   rebusAndroid: {
     fontSize: 30,
