@@ -54,7 +54,7 @@ class RebInput extends Component {
       textInputHeight = 40;
     }
     var STATUS_BAR_HEIGHT = Navigator.NavigationBar.Styles.General.StatusBarHeight;
-    this.viewMaxHeight = 125 + textInputHeight;
+    this.viewMaxHeight = 118 + textInputHeight;
     if (Platform.OS === 'android'){
       this.viewMaxHeight = 55 + textInputHeight;
     }
@@ -347,10 +347,7 @@ class RebInput extends Component {
         >
         <View style={styles.container}>
 
-            <ScrollView
-            onKeyboardDidShow={this.onKeyboardDidShow.bind(this)}
-            onKeyboardDidHide={this.onKeyboardDidHide.bind(this)}
-            >
+
 
               <View style={{flex:1, flexDirection: 'row',}}>
                 <View style={{width:60}}/>
@@ -360,7 +357,7 @@ class RebInput extends Component {
                 </View>
               </View>
 
-            </ScrollView>
+
             <View style={styles.textPlaceContainer}>
               <View style={styles.textInputContainer}>
                 <Button
@@ -403,14 +400,15 @@ class RebInput extends Component {
             onKeyboardDidShow={this.onKeyboardDidShow.bind(this)}
             onKeyboardDidHide={this.onKeyboardDidHide.bind(this)}
             >
-
-            <View style={{flex:1, flexDirection: 'row',}}>
+            {this.state.rebus != "" &&
+            <View style={{flex:1, flexDirection: 'row'}}>
               <View style={{width:60}}/>
-              <View style={{flex:1, flexDirection: 'column',}}>
-                <Text style={styles.rebus}>{this.state.rebus}</Text>
-                <View style={styles.triangleCorner} />
+              <View style={{flex:1, flexDirection: 'column'}}>
+                <Text style={styles.rebusWriting}>{this.state.rebus}</Text>
+                <View style={styles.triangleCornerWriting} />
               </View>
             </View>
+            }
 
             </ScrollView>
             <View style={styles.textPlaceContainer}>
@@ -751,7 +749,7 @@ const styles = StyleSheet.create({
     marginBottom:20
   },
   input:{
-    height: 50,
+    height: 40,
     fontSize: 18,
     fontWeight: 'bold',
     /*borderColor: 'gray',
@@ -844,6 +842,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#FDF058',
   },
+  rebusWriting: {
+    fontSize: 30,
+    alignSelf: 'stretch',
+    marginTop: 5,
+    marginRight: 20,
+    color: 'black',
+    borderRadius: 15,
+    paddingLeft: 5,
+    paddingRight: 14,
+    paddingBottom: 10,
+    paddingTop: 8,
+    marginLeft: 5,
+    justifyContent: 'center',
+    backgroundColor: '#fffac6',
+  },
   info:{
     backgroundColor : '#007bff'
   },
@@ -862,6 +875,21 @@ const styles = StyleSheet.create({
     borderTopWidth: 20,
     borderRightColor: 'transparent',
     borderTopColor: '#FDF058',
+    transform: [
+      {rotate: '90deg'}
+    ]
+  },
+  triangleCornerWriting: {
+    alignSelf: 'flex-end',
+    marginRight: 35,
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderRightWidth: 20,
+    borderTopWidth: 20,
+    borderRightColor: 'transparent',
+    borderTopColor: '#fffac6',
     transform: [
       {rotate: '90deg'}
     ]

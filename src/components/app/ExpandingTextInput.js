@@ -8,7 +8,7 @@ var ExpandingTextInput = React.createClass({
 
   getInitialState: function() {
     return {
-      height: 50,
+      height: 30,
       text: ""
     };
   },
@@ -32,8 +32,8 @@ var ExpandingTextInput = React.createClass({
 
   onHiddenLayout: function(event) {
     var height = event.nativeEvent.layout.height;
-    if (height < 50) {
-      height = 50;
+    if (height < 30) {
+      height = 30;
     }
     if (height > 205) {
       height = 205;
