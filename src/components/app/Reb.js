@@ -1,9 +1,9 @@
 'use strict';
 import React, { Component } from 'react';
 import { View, Text, StyleSheet,TextInput,TouchableHighlight, ScrollView, PixelRatio, Animated, Navigator, Dimensions, Platform, AsyncStorage, ToolbarAndroid} from 'react-native';
-//import { Actions } from 'react-native-router-flux';
 import Button from 'react-native-button';
 import dismissKeyboard from 'dismissKeyboard';
+import NotificationHandler from './NotificationHandler';
 var ExpandingTextInput = require("./ExpandingTextInput");
 var Clipboard = require('react-native-clipboard');
 import Radio, {RadioButton} from 'react-native-simple-radio-button';
@@ -38,6 +38,10 @@ class Reb extends Component {
        hideShare: true,
        hideShareAndroid: true
     };
+  }
+
+  updateBadge(){
+    this.props.updateBadge();
   }
 
   componentDidMount() {
@@ -128,6 +132,7 @@ class Reb extends Component {
             </ScrollView>
           </View>
           <MessageBarAlert ref="alert" />
+
         </Animated.View>
       );
     }else{
@@ -164,6 +169,7 @@ class Reb extends Component {
             </ScrollView>
           </View>
           <MessageBarAlert ref="alert" />
+          
         </Animated.View>
       );
     }

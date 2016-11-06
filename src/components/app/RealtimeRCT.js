@@ -35,6 +35,7 @@ var RealtimeRCT = React.createClass({
     RCTRealtimeMessaging.RTEventListener("onException",this._onException),
     RCTRealtimeMessaging.RTEventListener("onMessage",this._onMessage),
     RCTRealtimeMessaging.RTEventListener("onPresence",this._onPresence);
+    RCTRealtimeMessaging.RTPushNotificationListener(this._onNotification);
 
     RCTRealtimeMessaging.RTConnect(
     {
@@ -48,6 +49,11 @@ var RealtimeRCT = React.createClass({
 
   componentWillUnmount: function() {
     RCTRealtimeMessaging.RTDisconnect();
+  },
+
+  _onNotification: function(data)
+  {
+    this._log("Received notification: " + JSON.stringify(data));
   },
 
   doDisconnect:function(){

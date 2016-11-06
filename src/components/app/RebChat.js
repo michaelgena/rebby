@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet,TextInput,TouchableHighlight, ScrollView, PixelRatio, Animated, Navigator, Dimensions, Platform, AsyncStorage, ToolbarAndroid, ListView, RefreshControl, KeyboardAvoidingView} from 'react-native';
 
 import RebInput from './RebInput';
+import NotificationHandler from './NotificationHandler';
 import realtimeIOS from '../../../RCTRealtimeMessagingIOS';
 import realtimeAndroid from '../../../RCTRealtimeMessagingAndroid';
 var RCTRealtimeMessaging;
@@ -23,6 +24,7 @@ class RebChat extends Component {
     if (Platform.OS === 'android'){
       textInputHeight = 40;
     }
+
     this.viewMaxHeight = height;
 
     this.state = {
@@ -35,6 +37,9 @@ class RebChat extends Component {
        listHeight: 0,
        footerY: 0,
        reloaded: false,
+       myUserName:"",
+       myToken:"",
+       destinatorToken:this.props.token,
 
        channel: this.props.channel,
        appKey: conf.get().appKey,
@@ -57,9 +62,6 @@ class RebChat extends Component {
     //RCTRealtimeMessaging.RTEventListener("onPresence",this._onPresence);
 
 
-  }
-
-  componentDidMount() {
     AsyncStorage.getItem(this.state.channel).then((messages) => {
       //TODO load only last 10 messages
       if(messages !== null){
@@ -92,6 +94,29 @@ class RebChat extends Component {
       connectionMetadata: this.state.connectionMetadata,
       clusterUrl: this.state.clusterUrl
     });
+
+    AsyncStorage.getItem("userInfo").then((userInfo) => {
+      if(userInfo != null){
+        userInfo = userInfo.replace(/\|/g , ",");
+        userInfo = userInfo.replace(/\\"/g , "\"");
+        var userInfoAsJSON = JSON.parse(userInfo);
+        console.log("User info: "+JSON.stringify(userInfoAsJSON));
+        this.setState({
+          myUserName: userInfoAsJSON.name,
+          myToken: userInfoAsJSON.token
+        });
+      }
+    }).done();
+
+    
+  }
+
+  updateBadge(){
+    this.props.updateBadge();
+  }
+
+  componentDidMount() {
+
   }
 
   componentDidUpdate(){
@@ -284,7 +309,12 @@ class RebChat extends Component {
           <RebInput
             realtimeMessaging={RCTRealtimeMessaging}
             channel={this.state.channel}
-            buttonLabel={Send}
+            appKey={this.state.appKey}
+            privateKey={this.state.token}
+            myUserName={this.state.myUserName}
+            myToken={this.state.myToken}
+            destinatorToken={this.state.destinatorToken}
+            buttonLabel={"Send"}
           />
           </View>
         </View>
@@ -327,9 +357,15 @@ class RebChat extends Component {
           <RebInput
             realtimeMessaging={RCTRealtimeMessaging}
             channel={this.state.channel}
-            buttonLabel={'Send'}
+            appKey={this.state.appKey}
+            privateKey={this.state.token}
+            myUserName={this.state.myUserName}
+            myToken={this.state.myToken}
+            destinatorToken={this.state.destinatorToken}
+            buttonLabel={"Send"}
           />
         </KeyboardAvoidingView>
+        <NotificationHandler updateBadge={this.updateBadge.bind(this)}/>
       </Animated.View>
     );
   }

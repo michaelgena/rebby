@@ -1,6 +1,6 @@
 'use strict';
 import React, { Component } from 'react';
-import { NavigatorIOS, TabBarIOS, ToolbarAndroid, StyleSheet, Navigator, Platform, AsyncStorage } from 'react-native';
+import { View, NavigatorIOS, TabBarIOS, ToolbarAndroid, StyleSheet, Navigator, Platform, AsyncStorage } from 'react-native';
 
 import RebList from './components/app/RebList';
 import NewReb from './components/app/NewReb';
@@ -11,6 +11,7 @@ import RealtimeRCTAndroid from './components/app/RealtimeRCTAndroid';
 import ChatList from './components/app/ChatList';
 import Contacts from './components/app/Contacts';
 import Settings from './components/app/Settings';
+import NotificationHandler from './components/app/NotificationHandler';
 
 class Root extends Component{
 
@@ -18,11 +19,35 @@ class Root extends Component{
     super(props);
     this.state = {
       selectedTab: 'Rebs',
-      isOnBoarding: true
+      isOnBoarding: true,
+      nbNewMessages: 0
     };
   }
 
+  updateBadge(){
+    AsyncStorage.getItem("nbNewMessages").then((nbNewMessages) => {
+      if(nbNewMessages != null){
+        this.setState({
+          nbNewMessages: parseInt(nbNewMessages)+1
+        });
+      }else{
+        this.setState({
+          nbNewMessages: 1
+        });
+      }
+      AsyncStorage.setItem("nbNewMessages", this.state.nbNewMessages.toString());
+    }).done();
+  }
+
+  resetBadge(){
+    this.setState({
+        nbNewMessages: 0
+    });
+    AsyncStorage.setItem("nbNewMessages", this.state.nbNewMessages.toString());
+  }
+
   componentDidMount() {
+
     AsyncStorage.getItem("isOnBoarding").then((value) => {
       console.log("AsyncStorage:"+value);
       if(value !== null && value === "false"){
@@ -39,7 +64,7 @@ class Root extends Component{
           initialRoute={{
             title: 'Chats',
             component: ChatList,
-            passProps: this.props
+            passProps: {updateBadge: ()=>this.updateBadge(), resetBadge: ()=>this.resetBadge()}
           }}
           itemWrapperStyle={styles.itemWrapper}
         />
@@ -53,7 +78,7 @@ class Root extends Component{
           initialRoute={{
             title: 'Contacts',
             component: Contacts,
-            passProps: this.props
+            passProps: {updateBadge: ()=>this.updateBadge(), resetBadge: ()=>this.resetBadge()}
           }}
           itemWrapperStyle={styles.itemWrapper}
         />
@@ -68,7 +93,7 @@ class Root extends Component{
         initialRoute={{
           title: 'Settings',
           component: Settings,
-          passProps: this.props
+          passProps: {updateBadge: ()=>this.updateBadge(), resetBadge: ()=>this.resetBadge()}
         }}
         itemWrapperStyle={styles.itemWrapper}
       />
@@ -85,7 +110,6 @@ class Root extends Component{
           renderScene={this.navigatorRenderScene}/>
       );
     }else{
-
       return (
         <TabBarIOS>
           <TabBarIOS.Item
@@ -105,12 +129,14 @@ class Root extends Component{
           iconName="ios-chatbubbles-outline"
           iconSize={28}
           selectedIconColor="blue"
+          badge={this.state.nbNewMessages > 0 ? this.state.nbNewMessages : undefined}
           onPress={() => {
             this.setState({
               selectedTab: 'Chats',
             });
           }}>
           {this._renderContent()}
+
           </Icon.TabBarItemIOS>
           <Icon.TabBarItemIOS
           title="Rebs"
@@ -129,7 +155,7 @@ class Root extends Component{
               initialRoute={{
                 title: 'Rebs',
                 component: RebList,
-                passProps: this.props,
+                passProps: {updateBadge: ()=>this.updateBadge(), resetBadge: ()=>this.resetBadge()},
                 rightButtonTitle: "New",
                 onRightButtonPress: () => {
                   this.refs.nav.navigator.push({

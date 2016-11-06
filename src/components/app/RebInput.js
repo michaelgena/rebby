@@ -12,8 +12,6 @@ var MessageBarManager = require('react-native-message-bar').MessageBarManager;
 import Icon from 'react-native-vector-icons/Ionicons';
 import realtimeIOS from '../../../RCTRealtimeMessagingIOS';
 var RCTRealtimeMessaging;
-import NotificationHandler from './NotificationHandler';
-var notificationHandler = new NotificationHandler();
 
 var dataEN = require("../../data/EN.js");
 var dataFR = require("../../data/FR.js");
@@ -73,17 +71,45 @@ class RebInput extends Component {
        buttonLabel:props.buttonLabel != null ? props.buttonLabel : "Done",
        suggest1:{},
        suggest2:{},
-       suggest3:{},
-       channel: props.channel
+       suggest3:{}
     };
   }
 
   componentDidMount() {
-    notificationHandler.doConnect();
   }
 
   doSendMessage(message){
-    RCTRealtimeMessaging.RTSendMessage(message, this.state.channel);
+    //RCTRealtimeMessaging.RTSendMessage(message, props.channel);
+    var json = {};
+    var payload = {};
+    json.applicationKey = this.props.appKey;
+    json.privateKey = this.props.privateKey;
+    json.channel = this.props.destinatorToken;
+    json.message = this.props.myUserName+" says:\n"+message.rebus;
+
+    payload.sound = "default";
+    payload.badge = "1";
+    payload.UsrToken = this.props.myToken;
+    payload.UsrName = this.props.myUserName;
+    payload.date = message.date;
+    payload.channel = this.props.channel;
+    payload.message = message.rebus;
+    payload.text = message.text;
+    payload.language = message.language;
+
+    json.payload = JSON.stringify(payload);
+
+    var url = "https://ortc-mobilepush.realtime.co/mp/publish";
+
+    console.log(JSON.stringify(json));
+    fetch(url, {
+      method: 'POST',
+      body: JSON.stringify(json)
+    })
+    .then((response) => {
+      console.log("Response after pushing message...");
+      console.log(response);
+    }).done();
   }
 
   _onMessage(messageEvent){
@@ -116,7 +142,10 @@ class RebInput extends Component {
         rebAsString = rebAsString.replace(/,/g , "|");
         rebAsString = rebAsString.replace(/"/g , "\\\"");
 
-        this.doSendMessage(rebAsString);
+
+
+
+        this.doSendMessage(reb);
         /*AsyncStorage.getItem("myRebs")
         .then((rebs) => {
           if(rebs !== null){
@@ -130,18 +159,20 @@ class RebInput extends Component {
           }
         }).done();*/
 
-        AsyncStorage.getItem(this.state.channel)
+        AsyncStorage.getItem(this.props.channel)
         .then((rebs) => {
           if(rebs !== null){
             rebs = rebs.split(",");
             rebs.push(rebAsString);
-            AsyncStorage.setItem(this.state.channel, rebs.toString());
+            AsyncStorage.setItem(this.props.channel, rebs.toString());
           }else{
             var rebs = [];
             rebs.push(rebAsString);
-            AsyncStorage.setItem(this.state.channel, rebs.toString());
+            AsyncStorage.setItem(this.props.channel, rebs.toString());
           }
-        }).done();
+        })
+        .then(()=>this.forceUpdate())
+        .done();
       }
   }
   switchLanguage(){
@@ -409,7 +440,6 @@ class RebInput extends Component {
               </View>
             </View>
             }
-
             </ScrollView>
             <View style={styles.textPlaceContainer}>
               <View style={styles.textInputContainer}>

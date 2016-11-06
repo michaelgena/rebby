@@ -5,6 +5,7 @@ import { View, Text, StyleSheet,ListView,TouchableHighlight,ActivityIndicatorIOS
 import Spinner from 'react-native-loading-spinner-overlay';
 import RebChat from './RebChat';
 import Icon from 'react-native-vector-icons/Ionicons';
+import NotificationHandler from './NotificationHandler';
 
 var styles = StyleSheet.create({
     container: {
@@ -154,6 +155,10 @@ class ChatList extends Component {
 		 this._entries = [];
   }
 
+  updateBadge(){
+    this.props.updateBadge();
+  }
+
   render() {
     //AsyncStorage.removeItem("myRebs");
     //AsyncStorage.removeItem("isOnBoarding");
@@ -185,6 +190,7 @@ class ChatList extends Component {
       );
     }else{
       return (
+        <View>
      		<ListView
             refreshControl={
               <RefreshControl
@@ -196,6 +202,8 @@ class ChatList extends Component {
 						onEndReached={this._onEndReached.bind(this)}
           	style={styles.listView}
           	/>
+            <NotificationHandler updateBadge={this.updateBadge.bind(this)}/>
+          </View>
       );
     }
 	}
@@ -238,13 +246,17 @@ class ChatList extends Component {
                   <Text style={{fontWeight:'bold'}}>{rebChat.givenName}</Text>
                 </View>
 						    <View style={{width: this.state.width}}>
-									<Text style={ Platform.OS === 'ios' ? styles.rebus : styles.rebusAndroid} numberOfLines={1}>{rebChat.lastMessage}H🅰ve ⛽-el+n! </Text>
+									<Text style={ Platform.OS === 'ios' ? styles.rebus : styles.rebusAndroid} numberOfLines={1}>{rebChat.lastMessage}</Text>
 							  </View>
 							  <View style={styles.separator} />
               </View>
 					</View>
 			</TouchableHighlight>
 		);
+  }
+
+  componentWillMount() {
+    this.props.resetBadge();
   }
 
   componentDidMount() {
@@ -297,7 +309,7 @@ class ChatList extends Component {
       id: 'rebChat',
       title: rebChat.givenName,
       component: RebChat,
-      passProps: {givenName:rebChat.givenName, channel:rebChat.channel},
+      passProps: {givenName:rebChat.givenName, channel:rebChat.channel, token:rebChat.usrToken},
     })
   }
   navNewReb(){

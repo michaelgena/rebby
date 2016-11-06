@@ -33,6 +33,7 @@ var RealtimeRCT = React.createClass({
     RCTRealtimeMessaging.RTEventListener("onException",this._onException),
     RCTRealtimeMessaging.RTEventListener("onMessage",this._onMessage),
     RCTRealtimeMessaging.RTEventListener("onPresence",this._onPresence);
+    RCTRealtimeMessaging.RTCPushNotificationListener(this._onNotification);
 
     RCTRealtimeMessaging.RTConnect(
     {
