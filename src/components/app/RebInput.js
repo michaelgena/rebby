@@ -169,9 +169,8 @@ class RebInput extends Component {
               rebs.push(rebAsString);
               AsyncStorage.setItem(this.props.channel, rebs.toString());
             }
-          })
-          .then(()=>this.forceUpdate())
-          .done();
+            this.props.fetchData();
+          }).done();
         }
       }
   }

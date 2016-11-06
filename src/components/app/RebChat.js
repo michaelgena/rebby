@@ -304,6 +304,7 @@ class RebChat extends Component {
             myUserName={this.state.myUserName}
             myToken={this.state.myToken}
             destinatorToken={this.state.destinatorToken}
+            fetchData={this.fetchData.bind(this)}
             buttonLabel={"Send"}
           />
           </View>
@@ -352,6 +353,7 @@ class RebChat extends Component {
             myUserName={this.state.myUserName}
             myToken={this.state.myToken}
             destinatorToken={this.state.destinatorToken}
+            fetchData={this.fetchData.bind(this)}
             buttonLabel={"Send"}
           />
         </KeyboardAvoidingView>
