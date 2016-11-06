@@ -335,7 +335,6 @@ class RebList extends Component {
       );
     }else{
       return (
-        <View>
      		<ListView
             refreshControl={
               <RefreshControl
@@ -347,7 +346,6 @@ class RebList extends Component {
 						onEndReached={this._onEndReached.bind(this)}
           	style={styles.listView}
           	/>
-          </View>
       );
     }
 	}

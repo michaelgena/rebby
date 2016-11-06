@@ -134,45 +134,45 @@ class RebInput extends Component {
         this.state.text = "";
         this.state.suggest1 = this.state.suggest2 = this.state.suggest3 = "";
         this.userSelection = {};
-        /*this.setState({
-            done: true
-        });*/
 
         var rebAsString = JSON.stringify(reb);
         rebAsString = rebAsString.replace(/,/g , "|");
         rebAsString = rebAsString.replace(/"/g , "\\\"");
 
-
-
-
-        this.doSendMessage(reb);
-        /*AsyncStorage.getItem("myRebs")
-        .then((rebs) => {
-          if(rebs !== null){
-            rebs = rebs.split(",");
-            rebs.unshift(rebAsString);
-            AsyncStorage.setItem("myRebs", rebs.toString());
-          }else{
-            var rebs = [];
-            rebs.push(rebAsString);
-            AsyncStorage.setItem("myRebs", rebs.toString());
-          }
-        }).done();*/
-
-        AsyncStorage.getItem(this.props.channel)
-        .then((rebs) => {
-          if(rebs !== null){
-            rebs = rebs.split(",");
-            rebs.push(rebAsString);
-            AsyncStorage.setItem(this.props.channel, rebs.toString());
-          }else{
-            var rebs = [];
-            rebs.push(rebAsString);
-            AsyncStorage.setItem(this.props.channel, rebs.toString());
-          }
-        })
-        .then(()=>this.forceUpdate())
-        .done();
+        if(this.props.isReb){
+          this.setState({
+              done: true
+          });
+          AsyncStorage.getItem("myRebs")
+          .then((rebs) => {
+            if(rebs !== null){
+              rebs = rebs.split(",");
+              rebs.unshift(rebAsString);
+              AsyncStorage.setItem("myRebs", rebs.toString());
+            }else{
+              var rebs = [];
+              rebs.push(rebAsString);
+              AsyncStorage.setItem("myRebs", rebs.toString());
+            }
+            this.props.fetchData();
+          }).done();
+        }else{
+          this.doSendMessage(reb);
+          AsyncStorage.getItem(this.props.channel)
+          .then((rebs) => {
+            if(rebs !== null){
+              rebs = rebs.split(",");
+              rebs.push(rebAsString);
+              AsyncStorage.setItem(this.props.channel, rebs.toString());
+            }else{
+              var rebs = [];
+              rebs.push(rebAsString);
+              AsyncStorage.setItem(this.props.channel, rebs.toString());
+            }
+          })
+          .then(()=>this.forceUpdate())
+          .done();
+        }
       }
   }
   switchLanguage(){
@@ -216,158 +216,7 @@ class RebInput extends Component {
 
   }
 
-  tweet() {
-    KDSocialShare.tweet({
-        'text':this.state.rebus,
-        'link':'',
-        'imagelink':'',
-      },
-      (results) => {
-        console.log(results);
-      }
-    );
-  }
-
-  shareOnFacebook() {
-    KDSocialShare.shareOnFacebook({
-        'text':this.state.rebus,
-        'link':'',
-        'imagelink':'https://lh3.googleusercontent.com/Dffl5I2uYfuNhNeT2pMkHzJWjn99lz1uox4dEjRtwXA9OO5sO81h-oO8jmSkOFFFj3vwb7r7Z_qpIsoC3EKtTKc1M1MR',
-      },
-      (results) => {
-        console.log(results);
-      }
-    );
-  }
-
-  copyToClipboard(){
-    MessageBarManager.registerMessageBar(this.refs.alert);
-    Clipboard.set(this.state.rebus);
-    MessageBarManager.showAlert({
-      alertType: "info",
-      title: "Copied in your clipboard.",
-      titleNumberOfLines: 1,
-      messageNumberOfLines: 0,
-    });
-  }
-
-  render(){
-    if(this.state.done){
-      return this.renderShare();
-    }else{
-      return this.renderWrite();
-    }
-  }
-
-  renderShare() {
-      if(Platform.OS === 'android'){
-        return (
-          <Animated.View
-            style={{
-              height: this.state.height,
-              justifyContent: 'flex-end'
-            }}
-          >
-          <View style={styles.container}>
-              <View>
-                <ToolbarAndroid style={styles.toolbar}
-                            title={this.props.title}
-                            navIcon={require('./ic_arrow_back_white_24dp.png')}
-                            onIconClicked={this.props.navigator.pop}
-                            titleColor={'black'}/>
-              </View>
-              <ScrollView
-              onKeyboardDidShow={this.onKeyboardDidShow.bind(this)}
-              onKeyboardDidHide={this.onKeyboardDidHide.bind(this)}
-              >
-                <Text style={styles.rebusAndroid}> {this.state.rebus}</Text>
-                <View style={styles.triangleCorner} />
-                <View style={styles.shareContainer}>
-                  <TouchableHighlight onPress={this.copyToClipboard.bind(this)}>
-                    <View style={{flex:1, flexDirection: 'row', alignItems: 'center',justifyContent:'center', width: this.viewMaxWidth, height: 50,backgroundColor:'#CCCCCC'}}>
-                      <Text style={{color:'#ffffff',fontWeight:'800',}}>Copy </Text><Icon name="ios-clipboard" size={25} color="#FFFFFF"/>
-                    </View>
-                  </TouchableHighlight>
-                </View>
-              </ScrollView>
-            <View style={styles.textInputContainer}>
-              <Button
-                style={styles.sendButton}
-              >
-              {this.state.language}
-              </Button>
-              <ExpandingTextInput
-                value={this.state.text}
-                onChangeText={(text) => this.setState({text})}
-                controlled={true}
-                placeholder="Your text here..."
-                autoCorrect={true}
-                multiline={true}
-                onFocus={this.inputFocused.bind(this)}
-              />
-            </View>
-            </View>
-            <MessageBarAlert ref="alert" />
-          </Animated.View>
-        );
-      }else{
-        return (
-          <Animated.View
-            style={{
-              height: this.state.height,
-              justifyContent: 'flex-end'
-            }}
-          >
-          <View style={styles.container}>
-              <ScrollView
-              onKeyboardDidShow={this.onKeyboardDidShow.bind(this)}
-              onKeyboardDidHide={this.onKeyboardDidHide.bind(this)}
-              >
-                <Text style={styles.rebus}> {this.state.rebus}</Text>
-                <View style={styles.triangleCorner} />
-                <View style={styles.shareContainer}>
-                  <TouchableHighlight onPress={this.tweet.bind(this)}>
-                    <View style={{flex:1, flexDirection: 'row', alignItems: 'center',justifyContent:'center', width: this.viewMaxWidth/3, height: 50,backgroundColor:'#00aced'}}>
-                     <Text style={{color:'#ffffff',fontWeight:'800'}}>Share </Text><Icon name="logo-twitter" size={25} color="#FFFFFF" />
-                    </View>
-                  </TouchableHighlight>
-
-                  <TouchableHighlight onPress={this.shareOnFacebook.bind(this)}>
-                    <View style={{flex:1, flexDirection: 'row', alignItems: 'center',justifyContent:'center', width: this.viewMaxWidth/3, height: 50,backgroundColor:'#3b5998'}}>
-                     <Text style={{color:'#ffffff',fontWeight:'800',}}>Share </Text><Icon name="logo-facebook" size={25} color="#FFFFFF" />
-                    </View>
-                  </TouchableHighlight>
-
-                  <TouchableHighlight onPress={this.copyToClipboard.bind(this)}>
-                    <View style={{flex:1, flexDirection: 'row', alignItems: 'center',justifyContent:'center', width: this.viewMaxWidth/3, height: 50,backgroundColor:'#CCCCCC'}}>
-                      <Text style={{color:'#ffffff',fontWeight:'800',}}>Copy </Text><Icon name="ios-clipboard" size={25} color="#FFFFFF"/>
-                    </View>
-                  </TouchableHighlight>
-                </View>
-              </ScrollView>
-            <View style={styles.textInputContainer}>
-            <Button
-              style={styles.sendButton}
-            >
-            {this.state.language}
-            </Button>
-              <ExpandingTextInput
-                controlled={true}
-                placeholder="Your text here..."
-                autoCorrect={true}
-                multiline={true}
-                onFocus={this.inputFocused.bind(this)}
-              />
-            </View>
-            </View>
-            <MessageBarAlert ref="alert" />
-          </Animated.View>
-        );
-
-      }
-  }
-
-  renderWrite() {
+  render() {
     if(Platform.OS === 'android'){
       return (
         <Animated.View
@@ -490,6 +339,11 @@ class RebInput extends Component {
   }
 
   generate(text) {
+
+    if(this.props.isReb){
+      this.props.resetData();
+    }
+
     this.state.rebus = "";
     this.state.rebusArray = [];
     if(text.length == 0){
