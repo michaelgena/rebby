@@ -1,9 +1,7 @@
 'use strict';
 import React, { Component } from 'react';
 import { View, Text, StyleSheet,TextInput,TouchableHighlight, ScrollView, PixelRatio, Animated, Navigator, Dimensions, Platform, AsyncStorage, ToolbarAndroid, ListView, RefreshControl, KeyboardAvoidingView} from 'react-native';
-
 import RebInput from './RebInput';
-import NotificationHandler from './NotificationHandler';
 import realtimeIOS from '../../../RCTRealtimeMessagingIOS';
 import realtimeAndroid from '../../../RCTRealtimeMessagingAndroid';
 var RCTRealtimeMessaging;
@@ -61,32 +59,6 @@ class RebChat extends Component {
     RCTRealtimeMessaging.RTEventListener("onMessage",this._onMessage.bind(this));
     //RCTRealtimeMessaging.RTEventListener("onPresence",this._onPresence);
 
-
-    AsyncStorage.getItem(this.state.channel).then((messages) => {
-      //TODO load only last 10 messages
-      if(messages !== null){
-        messages = messages.split(",");
-        this.state.nbItems = messages.length;
-        console.log("Messages Length: "+this.state.nbItems);
-
-        this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(messages),
-          isLoading: false,
-          reloading: false
-        });
-      }else{
-        console.log("it's empty");
-        var messages = [];
-        messages.push("{\"status\":\"empty\"}");
-        this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(messages),
-          isLoading: false,
-          reloading: false
-        });
-      }
-
-    }).done();
-
     RCTRealtimeMessaging.RTConnect(
     {
       appKey: this.state.appKey,
@@ -108,15 +80,11 @@ class RebChat extends Component {
       }
     }).done();
 
-    
-  }
-
-  updateBadge(){
-    this.props.updateBadge();
   }
 
   componentDidMount() {
-
+    this.fetchData();
+    console.log('Displayed Chat component.');
   }
 
   componentDidUpdate(){
@@ -198,8 +166,30 @@ class RebChat extends Component {
   }
 
   fetchData() {
-    this.setState({reloading: false});
-    //TODO load previous 10 messages
+    AsyncStorage.getItem(this.state.channel).then((messages) => {
+      //TODO load only last 10 messages
+      if(messages !== null){
+        messages = messages.split(",");
+        this.state.nbItems = messages.length;
+        console.log("Messages Length: "+this.state.nbItems);
+
+        this.setState({
+          dataSource: this.state.dataSource.cloneWithRows(messages),
+          isLoading: false,
+          reloading: false
+        });
+      }else{
+        console.log("it's empty");
+        var messages = [];
+        messages.push("{\"status\":\"empty\"}");
+        this.setState({
+          dataSource: this.state.dataSource.cloneWithRows(messages),
+          isLoading: false,
+          reloading: false
+        });
+      }
+
+    }).done();
   }
 
   renderLoadingView() {
@@ -365,7 +355,7 @@ class RebChat extends Component {
             buttonLabel={"Send"}
           />
         </KeyboardAvoidingView>
-        <NotificationHandler updateBadge={this.updateBadge.bind(this)}/>
+
       </Animated.View>
     );
   }

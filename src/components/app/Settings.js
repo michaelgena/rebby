@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet,TextInput,TouchableHighlight, ScrollView, PixelRatio, Animated, Navigator, Dimensions, Platform, AsyncStorage, ToolbarAndroid} from 'react-native';
 import Button from 'react-native-button';
-import NotificationHandler from './NotificationHandler';
 
 class Settings extends Component {
 
@@ -65,7 +64,7 @@ class Settings extends Component {
           <Text style={{marginLeft:5}}>Your Phone Number</Text>
           <Text style={{marginLeft:5, fontWeight:'bold'}}>{userInfoAsJSON.phoneNumber}</Text>
           <Button style={styles.button} onPress={() => this.revokeAccount(this)}>Revoke</Button>
-          <NotificationHandler updateBadge={this.updateBadge.bind(this)}/>
+
         </View>
       );
 

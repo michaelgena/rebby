@@ -11,21 +11,29 @@ import RealtimeRCTAndroid from './components/app/RealtimeRCTAndroid';
 import ChatList from './components/app/ChatList';
 import Contacts from './components/app/Contacts';
 import Settings from './components/app/Settings';
-import NotificationHandler from './components/app/NotificationHandler';
 
 class Root extends Component{
 
   constructor(props) {
     super(props);
     this.state = {
-      selectedTab: 'Rebs',
+      selectedTab: 'Chats',
       isOnBoarding: true,
       nbNewMessages: 0
     };
+
+    AsyncStorage.getItem("nbNewMessages").then((nbNewMessages) => {
+      if(nbNewMessages != null){
+        this.setState({
+          nbNewMessages: nbNewMessages
+        });
+      }
+    }).done();
   }
 
-  updateBadge(){
+  addOneToBadge(){
     AsyncStorage.getItem("nbNewMessages").then((nbNewMessages) => {
+      console.log("Nb New Messages ["+nbNewMessages+"]");
       if(nbNewMessages != null){
         this.setState({
           nbNewMessages: parseInt(nbNewMessages)+1
@@ -33,6 +41,21 @@ class Root extends Component{
       }else{
         this.setState({
           nbNewMessages: 1
+        });
+      }
+      AsyncStorage.setItem("nbNewMessages", this.state.nbNewMessages.toString());
+    }).done();
+  }
+
+  removeOneToBadge(){
+    AsyncStorage.getItem("nbNewMessages").then((nbNewMessages) => {
+      if(nbNewMessages != null && nbNewMessages > 0){
+        this.setState({
+          nbNewMessages: parseInt(nbNewMessages)-1
+        });
+      }else{
+        this.setState({
+          nbNewMessages: 0
         });
       }
       AsyncStorage.setItem("nbNewMessages", this.state.nbNewMessages.toString());
@@ -64,7 +87,7 @@ class Root extends Component{
           initialRoute={{
             title: 'Chats',
             component: ChatList,
-            passProps: {updateBadge: ()=>this.updateBadge(), resetBadge: ()=>this.resetBadge()}
+            passProps: {addOneToBadge: ()=>this.addOneToBadge(), removeOneToBadge: ()=>this.removeOneToBadge(), resetBadge: ()=>this.resetBadge()}
           }}
           itemWrapperStyle={styles.itemWrapper}
         />
@@ -78,7 +101,7 @@ class Root extends Component{
           initialRoute={{
             title: 'Contacts',
             component: Contacts,
-            passProps: {updateBadge: ()=>this.updateBadge(), resetBadge: ()=>this.resetBadge()}
+            passProps: {addOneToBadge: ()=>this.addOneToBadge(), removeOneToBadge: ()=>this.removeOneToBadge(), resetBadge: ()=>this.resetBadge()}
           }}
           itemWrapperStyle={styles.itemWrapper}
         />
@@ -93,7 +116,7 @@ class Root extends Component{
         initialRoute={{
           title: 'Settings',
           component: Settings,
-          passProps: {updateBadge: ()=>this.updateBadge(), resetBadge: ()=>this.resetBadge()}
+          passProps: {addOneToBadge: ()=>this.addOneToBadge(), removeOneToBadge: ()=>this.removeOneToBadge(), resetBadge: ()=>this.resetBadge()}
         }}
         itemWrapperStyle={styles.itemWrapper}
       />
@@ -106,7 +129,7 @@ class Root extends Component{
 
         <Navigator
           style={styles.container}
-          initialRoute={{id: 'rebList'}}
+          initialRoute={{id: 'chatList'}}
           renderScene={this.navigatorRenderScene}/>
       );
     }else{
@@ -155,7 +178,7 @@ class Root extends Component{
               initialRoute={{
                 title: 'Rebs',
                 component: RebList,
-                passProps: {updateBadge: ()=>this.updateBadge(), resetBadge: ()=>this.resetBadge()},
+                passProps: {addOneToBadge: ()=>this.addOneToBadge(), removeOneToBadge: ()=>this.removeOneToBadge(), resetBadge: ()=>this.resetBadge()},
                 rightButtonTitle: "New",
                 onRightButtonPress: () => {
                   this.refs.nav.navigator.push({

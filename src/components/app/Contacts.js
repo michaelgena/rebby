@@ -374,7 +374,7 @@ class Contacts extends Component {
   						onEndReached={this._onEndReached.bind(this)}
             	style={styles.listView}
             	/>
-              <NotificationHandler updateBadge={this.updateBadge.bind(this)}/>
+              
           </View>
         );
       }else{

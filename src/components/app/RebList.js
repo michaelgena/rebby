@@ -6,7 +6,6 @@ import Spinner from 'react-native-loading-spinner-overlay';
 import Reb from './Reb';
 import NewReb from './NewReb';
 import Icon from 'react-native-vector-icons/Ionicons';
-import NotificationHandler from './NotificationHandler';
 
 var styles = StyleSheet.create({
     container: {
@@ -157,9 +156,6 @@ class RebList extends Component {
 		 this._entries = [];
   }
 
-  updateBadge(){
-    this.props.updateBadge();
-  }
 
   render() {
     //AsyncStorage.removeItem("myRebs");
@@ -333,6 +329,7 @@ class RebList extends Component {
   						onEndReached={this._onEndReached.bind(this)}
             	style={styles.listView}
             	/>
+
           </View>
         </View>
       );
@@ -350,7 +347,6 @@ class RebList extends Component {
 						onEndReached={this._onEndReached.bind(this)}
           	style={styles.listView}
           	/>
-            <NotificationHandler updateBadge={this.updateBadge.bind(this)}/>
           </View>
       );
     }

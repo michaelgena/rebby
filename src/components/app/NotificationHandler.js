@@ -106,17 +106,19 @@ class NotificationHandler extends Component {
 
   _onNotification(data){
     console.log("Received notification: " + JSON.stringify(data));
-    this.props.updateBadge();
+
     var chatList = [];
+    var nbUnreadMessage = 0;
     AsyncStorage.getItem("chatList").then((chats) => {
       if(chats !== null){
         var index = -1;
         chatList = chats.split(",");
         for(var i=0; i<chatList.length; i++){
           var chatAsJSON = this.asyncDataToJSON(chatList[i]);
-          console.log("Chat info:" + JSON.stringify(chatAsJSON));
+
           if(chatAsJSON.usrToken == data.UsrToken){
             index = i;
+            nbUnreadMessage = (typeof(chatAsJSON.nbUnreadMessage) != "undefined") ? chatAsJSON.nbUnreadMessage : 0;
             break;
           }
         }
@@ -130,11 +132,18 @@ class NotificationHandler extends Component {
       chat.lastMessage = data.message;
       chat.lastDate = data.date;
       chat.channel = data.channel;
+      console.log("Do we need to add +1 to badge?" + JSON.stringify(chatAsJSON));
+      if(nbUnreadMessage == 0){
+        console.log("yes!");
+        this.props.addOneToBadge();
+      }
+      chat.nbUnreadMessage = nbUnreadMessage+1;
       var chatAsString = JSON.stringify(chat);
       chatAsString = chatAsString.replace(/,/g , "|");
       chatAsString = chatAsString.replace(/"/g , "\\\"");
       chatList.unshift(chatAsString);
       AsyncStorage.setItem("chatList", chatList.toString());
+      this.props.refreshChatList();
     }).done();
 
     //Save the message

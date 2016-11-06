@@ -13,7 +13,6 @@ var MessageBarAlert = require('react-native-message-bar').MessageBar;
 var MessageBarManager = require('react-native-message-bar').MessageBarManager;
 
 import Icon from 'react-native-vector-icons/Ionicons';
-import NotificationHandler from './NotificationHandler';
 
 var dataEN = require("../../data/EN.js");
 var dataFR = require("../../data/FR.js");
@@ -411,7 +410,7 @@ class NewReb extends Component {
               </View>
             </View>
           </View>
-          
+
         </Animated.View>
       );
     }

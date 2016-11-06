@@ -5,6 +5,7 @@ import { View, Text, StyleSheet,ListView,TouchableHighlight,ActivityIndicatorIOS
 import Spinner from 'react-native-loading-spinner-overlay';
 import RebChat from './RebChat';
 import Icon from 'react-native-vector-icons/Ionicons';
+import Badge from 'react-native-smart-badge';
 import NotificationHandler from './NotificationHandler';
 
 var styles = StyleSheet.create({
@@ -153,10 +154,21 @@ class ChatList extends Component {
 	   this._hasNextPage = true;
 	   this._isFetching = false;
 		 this._entries = [];
+
+     this.fetchData();
   }
 
-  updateBadge(){
-    this.props.updateBadge();
+  addOneToBadge(){
+    this.props.addOneToBadge();
+  }
+
+  refreshChatList(){
+    this.fetchData();
+  }
+
+  removeOneToBadge(){
+    this.props.removeOneToBadge();
+    this.fetchData();
   }
 
   render() {
@@ -190,19 +202,19 @@ class ChatList extends Component {
       );
     }else{
       return (
-        <View>
-     		<ListView
-            refreshControl={
-              <RefreshControl
-              refreshing={this.state.reloading}
-              onRefresh={this._onRefresh.bind(this)}/>
-            }
-          	dataSource={this.state.dataSource}
-          	renderRow={this.renderChat.bind(this)}
-						onEndReached={this._onEndReached.bind(this)}
-          	style={styles.listView}
-          	/>
-            <NotificationHandler updateBadge={this.updateBadge.bind(this)}/>
+        <View style={{flex: 1}}>
+       		<ListView
+              refreshControl={
+                <RefreshControl
+                refreshing={this.state.reloading}
+                onRefresh={this._onRefresh.bind(this)}/>
+              }
+            	dataSource={this.state.dataSource}
+            	renderRow={this.renderChat.bind(this)}
+  						onEndReached={this._onEndReached.bind(this)}
+            	style={styles.listView}
+            	/>
+            <NotificationHandler addOneToBadge={this.addOneToBadge.bind(this)} refreshChatList={this.refreshChatList.bind(this)}/>
           </View>
       );
     }
@@ -243,9 +255,20 @@ class ChatList extends Component {
               </View>
               <View>
                 <View style={{height: 25, backgroundColor: '#FFFFFF', width: this.state.width, marginTop: 10}}>
-                  <Text style={{fontWeight:'bold'}}>{rebChat.givenName}</Text>
+                  <View style={{flex:1, flexDirection: 'row'}}>
+                    <View>
+                    <Text style={{fontWeight:'bold'}}>{rebChat.givenName}</Text>
+                    </View>
+                    <View>
+                    {typeof(rebChat.nbUnreadMessage) != "undefined" && rebChat.nbUnreadMessage>0 &&
+                    <Badge minWidth={18} minHeight={18} textStyle={{color: '#fff',}}>
+                      {rebChat.nbUnreadMessage}
+                    </Badge>
+                    }
+                    </View>
+                  </View>
                 </View>
-						    <View style={{width: this.state.width}}>
+						    <View style={{width: this.state.width-80}}>
 									<Text style={ Platform.OS === 'ios' ? styles.rebus : styles.rebusAndroid} numberOfLines={1}>{rebChat.lastMessage}</Text>
 							  </View>
 							  <View style={styles.separator} />
@@ -256,11 +279,11 @@ class ChatList extends Component {
   }
 
   componentWillMount() {
-    this.props.resetBadge();
+
   }
 
   componentDidMount() {
-    this.fetchData();
+
   }
 
   fetchData() {
@@ -304,12 +327,59 @@ class ChatList extends Component {
 	   this._fetchCurrentPage().done();
 	}
 
+  asyncDataToJSON(data){
+    var result = null;
+    if(data != null){
+      data = data.replace(/\|/g , ",");
+      data = data.replace(/\\"/g , "\"");
+      result = JSON.parse(data);
+    }
+    return result;
+  }
+
+ updateBadge(channel){
+    var chatList = [];
+    var chatAsJSON= {};
+    AsyncStorage.getItem("chatList").then((chats) => {
+      if(chats !== null){
+        var index = -1;
+        chatList = chats.split(",");
+        for(var i=0; i<chatList.length; i++){
+          chatAsJSON = this.asyncDataToJSON(chatList[i]);
+          console.log("Chat info:" + JSON.stringify(chatAsJSON));
+          if(chatAsJSON.channel == channel){
+            index = i;
+            break;
+          }
+        }
+        if(index > -1){
+          chatList.splice(index, 1);
+          if(chatAsJSON.nbUnreadMessage > 0){
+            this.props.removeOneToBadge();
+          }
+          chatAsJSON.nbUnreadMessage = 0;
+          var chatAsString = JSON.stringify(chatAsJSON);
+          chatAsString = chatAsString.replace(/,/g , "|");
+          chatAsString = chatAsString.replace(/"/g , "\\\"");
+          chatList.splice(index, 0, chatAsString);
+          AsyncStorage.setItem("chatList", chatList.toString());
+          this.setState({
+            dataSource: this.state.dataSource.cloneWithRows(chatList),
+            isLoading: false,
+            reloading: false
+          });
+        }
+      }
+    }).done();
+  }
+
   navRebChat(rebChat){
+    this.updateBadge(rebChat.channel);
     this.props.navigator.push({
       id: 'rebChat',
       title: rebChat.givenName,
       component: RebChat,
-      passProps: {givenName:rebChat.givenName, channel:rebChat.channel, token:rebChat.usrToken},
+      passProps: {givenName:rebChat.givenName, channel:rebChat.channel, token:rebChat.usrToken, removeOneToBadge: ()=>this.removeOneToBadge()},
     })
   }
   navNewReb(){
