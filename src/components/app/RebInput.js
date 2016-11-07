@@ -368,6 +368,7 @@ class RebInput extends Component {
           i++;
           rebusObj.word = "";
           rebusObj.initialWord = "";
+          rebusObj.fullWord = "";
           rebusObj.delta = "";
           rebusObj.left = "";
           rebusObj.prev = "";
@@ -376,6 +377,7 @@ class RebInput extends Component {
         }
         rebusObj.word = textArray[i];
         rebusObj.initialWord = rebusObj.word;
+        rebusObj.fullWord = rebusObj.word;
         rebusObj.i = i;
         var char = rebusObj.word.toLowerCase().charAt(0);
 
@@ -432,6 +434,7 @@ class RebInput extends Component {
           this.state.rebusArray.push(rebusObjJSON);
           rebusObj.word = "";
           rebusObj.initialWord = "";
+          rebusObj.fullWord = "";
           rebusObj.delta = "";
           rebusObj.left = "";
           rebusObj.prev = "";
@@ -439,6 +442,7 @@ class RebInput extends Component {
         }else{
           rebusObj.word = "";
           rebusObj.initialWord = "";
+          rebusObj.fullWord = "";
           rebusObj.delta = "";
           rebusObj.left = "";
           rebusObj.prev = "";
@@ -451,6 +455,7 @@ class RebInput extends Component {
         }
         rebusObj.word = "";
         rebusObj.initialWord = "";
+        rebusObj.fullWord = "";
         rebusObj.delta = "";
         rebusObj.left = "";
         rebusObj.prev = "";
@@ -474,8 +479,8 @@ class RebInput extends Component {
   buildRebus(rebusArray){
 
     //if the user chose another rebus then replace the standard by it
-    if(typeof(this.userSelection[rebusArray.word]) !== "undefined"){
-      var userSelection = this.userSelection[rebusArray.word];
+    if(typeof(this.userSelection[rebusArray.fullWord]) !== "undefined"){
+      var userSelection = this.userSelection[rebusArray.fullWord];
       //console.log("userSelection:"+JSON.stringify(userSelection));
       rebusArray = userSelection;
     }
@@ -609,12 +614,17 @@ class RebInput extends Component {
   replaceOrAddRebBySuggest(obj){
     var rebusObjJSON = JSON.parse(JSON.stringify(obj));
     //console.log("reb:"+rebusObjJSON);
-    if(this.state.rebusArray.length>0 && this.state.rebusArray[this.state.rebusArray.length-1].nbSpace == obj.nbSpace && this.state.currentText.length >= this.state.previousText.length && typeof(obj.i) !== "undefined"){
+
+    this.state.rebusArray.pop();
+    this.state.rebusArray.pop();
+    this.state.rebusArray.push(rebusObjJSON);
+
+    /*if(this.state.rebusArray.length>0 && this.state.rebusArray[this.state.rebusArray.length-1].nbSpace == obj.nbSpace && this.state.currentText.length >= this.state.previousText.length && typeof(obj.i) !== "undefined"){
       this.state.rebusArray.splice(obj.i,1);
       this.state.rebusArray.splice(obj.i, 0, rebusObjJSON);
     }else{
       this.state.rebusArray.push(rebusObjJSON);
-    }
+    }*/
     var rebus = "";
     for(var r=0; r<this.state.rebusArray.length; r++){
       if(rebus !== ""){
@@ -627,7 +637,7 @@ class RebInput extends Component {
     });
 
     //save user's selection for later
-    this.userSelection[obj.word] = rebusObjJSON;
+    this.userSelection[obj.fullWord] = rebusObjJSON;
   }
 }
 
