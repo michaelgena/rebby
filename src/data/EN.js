@@ -199,7 +199,7 @@ exports.get = function() {
 			{'name':'ear', 'value':'\u{1F442}'},
 			{'name':'early', 'value':'\u{1F307}'},
 			{'name':'earth', 'value':'\u{1F30D}'},
-			{'name':'egg', 'value':'\u{1F373}'},
+			/*{'name':'egg', 'value':'\u{1F373}'},*/
 			{'name':'eject', 'value':'\u{23CF}'},
 			{'name':'elephant', 'value':'\u{1F418}'},
 			{'name':'envelope', 'value':'\u{2709}'},

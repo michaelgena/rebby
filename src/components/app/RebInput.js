@@ -132,7 +132,7 @@ class RebInput extends Component {
         this.state.rebus = "";
 
         this.state.text = "";
-        this.state.suggest1 = this.state.suggest2 = this.state.suggest3 = "";
+        this.state.suggest1 = this.state.suggest2 = this.state.suggest3 = {};
         this.userSelection = {};
 
         var rebAsString = JSON.stringify(reb);
@@ -214,6 +214,7 @@ class RebInput extends Component {
       }).start();
 
   }
+
 
   render() {
     if(Platform.OS === 'android'){
@@ -299,7 +300,7 @@ class RebInput extends Component {
                 </Button>
                 <ExpandingTextInput
                   value={this.state.text}
-                  onChangeText={(text) => {this.setState({text});this.generate(this.state.text)}}
+                  onChangeText={(text) => {this.generate(text)}}
                   controlled={true}
                   placeholder="Your text here..."
                   autoCorrect={true}
@@ -338,6 +339,8 @@ class RebInput extends Component {
   }
 
   generate(text) {
+
+    this.state.text = text;
 
     if(this.props.isReb){
       this.props.resetData();
@@ -471,30 +474,28 @@ class RebInput extends Component {
   buildRebus(rebusArray){
 
     //if the user chose another rebus then replace the standard by it
-    if(this.userSelection !== undefined  && this.userSelection !== null){
+    if(typeof(this.userSelection[rebusArray.word]) !== "undefined"){
       var userSelection = this.userSelection[rebusArray.word];
-      console.log("userSelection:"+JSON.stringify(userSelection));
-      if(userSelection !== undefined && userSelection !== null){
-        rebusArray = userSelection;
-      }
+      //console.log("userSelection:"+JSON.stringify(userSelection));
+      rebusArray = userSelection;
     }
 
     var rebus = "";
-    if(rebusArray.prev !== undefined && rebusArray.prev.length>0){
+    if(typeof(rebusArray.prev) !== "undefined" && rebusArray.prev.length>0){
       rebus += rebusArray.prev;
     }
-    if(rebusArray.rebus !== undefined && rebusArray.rebus.length>0){
+    if(typeof(rebusArray.rebus) !== "undefined" && rebusArray.rebus.length>0){
       rebus += rebusArray.rebus;
     }else{
       rebus += rebusArray.word;
     }
-    if(rebusArray.left !== undefined && rebusArray.left.length>0){
-      if(rebusArray.delta !== undefined && rebusArray.delta.length>0){
+    if(typeof(rebusArray.left) !== "undefined" && rebusArray.left.length>0){
+      if(typeof(rebusArray.delta) !== "undefined" && rebusArray.delta.length>0){
         rebus += "-"+rebusArray.delta+"+"+rebusArray.left;
       }else{
         rebus += rebusArray.left;
       }
-    }else if(rebusArray.delta !== undefined && rebusArray.delta.length>0){
+    }else if(typeof(rebusArray.delta) !== "undefined" && rebusArray.delta.length>0){
       rebus += "-"+rebusArray.delta;
     }
     return rebus;
@@ -519,7 +520,7 @@ class RebInput extends Component {
             }
             if(autoSave){
               var rebusObjJSON = JSON.parse(JSON.stringify(obj));
-              if(this.state.rebusArray.length>0 && this.state.rebusArray[this.state.rebusArray.length-1].nbSpace == obj.nbSpace && this.state.currentText.length >= this.state.previousText.length){
+              if(this.state.rebusArray.length>0 && this.state.rebusArray[this.state.rebusArray.length-1].nbSpace == obj.nbSpace && this.state.currentText.length >= this.state.previousText.length && typeof(obj.i) !== "undefined"){
                 this.state.rebusArray.splice(obj.i,1);
                 this.state.rebusArray.splice(obj.i, 0, rebusObjJSON);
               }else{
@@ -528,7 +529,7 @@ class RebInput extends Component {
             }
 
             //build the suggestions
-            this.state.suggest1 = this.state.suggest2 = this.state.suggest3 = "";
+            this.state.suggest1 = this.state.suggest2 = this.state.suggest3 = {};
             if(json[char].length>j+1){
               if(json[char][j+1].name.startsWith(obj.word.toLowerCase().latinize()) == true){
                 obj.rebus = json[char][j+1].value;
@@ -590,19 +591,25 @@ class RebInput extends Component {
   }
 
   replaceOrAddRebBySuggest1(){
-    this.replaceOrAddRebBySuggest(this.state.suggest1);
+    if(JSON.stringify(this.state.suggest1) !== JSON.stringify({})){
+      this.replaceOrAddRebBySuggest(this.state.suggest1);
+    }
   }
   replaceOrAddRebBySuggest2(){
-    this.replaceOrAddRebBySuggest(this.state.suggest2);
+    if(JSON.stringify(this.state.suggest2) !== JSON.stringify({})){
+      this.replaceOrAddRebBySuggest(this.state.suggest2);
+    }
   }
   replaceOrAddRebBySuggest3(){
-    this.replaceOrAddRebBySuggest(this.state.suggest3);
+    if(JSON.stringify(this.state.suggest3) !== JSON.stringify({})){
+      this.replaceOrAddRebBySuggest(this.state.suggest3);
+    }
   }
 
   replaceOrAddRebBySuggest(obj){
     var rebusObjJSON = JSON.parse(JSON.stringify(obj));
     //console.log("reb:"+rebusObjJSON);
-    if(this.state.rebusArray.length>0 && this.state.rebusArray[this.state.rebusArray.length-1].nbSpace == obj.nbSpace && this.state.currentText.length >= this.state.previousText.length){
+    if(this.state.rebusArray.length>0 && this.state.rebusArray[this.state.rebusArray.length-1].nbSpace == obj.nbSpace && this.state.currentText.length >= this.state.previousText.length && typeof(obj.i) !== "undefined"){
       this.state.rebusArray.splice(obj.i,1);
       this.state.rebusArray.splice(obj.i, 0, rebusObjJSON);
     }else{

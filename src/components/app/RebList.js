@@ -453,14 +453,7 @@ class RebList extends Component {
       id: 'reb',
       title: 'Reb',
       component: Reb,
-      passProps: {rebus:reb.rebus, text:reb.text, language: reb.language},
-      rightButtonTitle: 'Re-use',
-      onRightButtonPress: () => {
-        this.props.navigator.push({
-          title: "New",
-          component: NewReb,
-          passProps: {rebus:reb.rebus, text:reb.text, language: reb.language}
-        });}
+      passProps: {rebus:reb.rebus, text:reb.text, language: reb.language}
     })
   }
   navNewReb(){

@@ -129,7 +129,7 @@ class NewReb extends Component {
     return (
       <View>
         <View style={{flex:1, flexDirection: 'row',}}>
-          <View style={{width:40}}/>
+          <View style={{width:14}}/>
           <View style={{flex:1, flexDirection: 'column',}}>
             <Text style={Platform.OS === 'android'? styles.rebusAndroid : styles.rebus}>{reb.rebus}</Text>
             <View style={styles.triangleCorner} />
