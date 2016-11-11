@@ -2,7 +2,8 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet,TextInput,TouchableHighlight, ScrollView, PixelRatio, Animated, Navigator, Dimensions, Platform, AsyncStorage, ToolbarAndroid} from 'react-native';
 import Button from 'react-native-button';
-
+import Icon from 'react-native-vector-icons/Ionicons';
+import Spinner from 'react-native-loading-spinner-overlay';
 class Settings extends Component {
 
   constructor(props) {
@@ -10,16 +11,19 @@ class Settings extends Component {
 
     this.state = {
        hasAccount:false,
+       isLoading: true,
        userInfo:""
     };
   }
 
-  updateBadge(){
-    this.props.updateBadge();
-  }
-
-  componentDidMount() {
+  fetchData(){
+    this.setState({
+       isLoading: true
+    });
     AsyncStorage.getItem("userInfo").then((result) => {
+      this.setState({
+        isLoading: false
+      });
       if(result != null){
         console.log(result);
         this.setState({
@@ -28,6 +32,10 @@ class Settings extends Component {
         });
       }
     }).done();
+  }
+
+  componentDidMount() {
+    this.fetchData();
   }
 
   componentWillUnmount() {
@@ -42,7 +50,23 @@ class Settings extends Component {
     });
   }
 
+  renderLoadingView() {
+    if (Platform.OS === 'ios'){
+      return (
+      	<View style={styles.loading}>
+          <Spinner size='large' visible={true} overlayColor="#FDF058"/>
+      	</View>
+  	  );
+    }else{
+      return null;
+    }
+	}
+
   render(){
+    if(this.state.isLoading){
+      return this.renderLoadingView();
+    }
+
     if(!this.state.hasAccount){
       return (
 				<View style={{flex:1}}>
@@ -50,6 +74,13 @@ class Settings extends Component {
 								<Text style={{color:'#ffffff',fontWeight:'800',}} numberOfLines={1}>No registered account to display for now.</Text>
 						</View>
 						<View style={styles.separator} />
+            <View>
+              <TouchableHighlight onPress={() => this.fetchData(this)} underlayColor="#FFFFFF">
+                <View style={{alignItems: 'center',justifyContent:'center', width: this.viewMaxWidth, height: 40, backgroundColor:'#FDF058', marginTop:10, marginLeft: 10, marginRight: 10}}>
+                  <Text style={{fontWeight:'800'}}>Refresh</Text>
+                </View>
+              </TouchableHighlight>
+            </View>
 				</View>
   		);
     }else{
@@ -59,24 +90,34 @@ class Settings extends Component {
       console.log(userInfoAsJSON.phoneNumber);
       return (
         <View style={styles.container}>
-          <Text style={{marginTop:70, marginLeft:5}}>Your Name</Text>
-          <Text style={{marginLeft:5, fontWeight:'bold'}}>{userInfoAsJSON.name}</Text>
-          <Text style={{marginLeft:5}}>Your Phone Number</Text>
-          <Text style={{marginLeft:5, fontWeight:'bold'}}>{userInfoAsJSON.phoneNumber}</Text>
-          <Button style={styles.button} onPress={() => this.revokeAccount(this)}>Revoke</Button>
-
+          <View style={{flex:1, flexDirection: 'row', marginLeft: 10, marginRight: 10, paddingLeft: 10, paddingRight: 5, backgroundColor: '#FDF058', height: 90}}>
+            <View style={{paddingLeft: 5, paddingRight: 5, backgroundColor: '#FDF058'}}>
+              <Icon name="ios-contact" size={80} color="#CCCCCC"/>
+            </View>
+            <View style={{height: 70, backgroundColor: '#FDF058', paddingTop: 10}}>
+              <Text style={{marginLeft:5, fontWeight:'bold'}}>{userInfoAsJSON.name}</Text>
+              <Text style={{marginLeft:5}}>Your Phone Number</Text>
+              <Text style={{marginLeft:5, fontWeight:'bold'}}>{userInfoAsJSON.phoneNumber}</Text>
+            </View>
+          </View>
+          <View>
+            <TouchableHighlight onPress={() => this.revokeAccount(this)} underlayColor="#FFFFFF">
+              <View style={{alignItems: 'center',justifyContent:'center', width: this.viewMaxWidth, height: 40,backgroundColor:'#CCCCCC', marginTop:10, marginLeft: 10, marginRight: 10}}>
+                <Text style={{fontWeight:'800'}}>Disable</Text>
+              </View>
+            </TouchableHighlight>
+          </View>
         </View>
       );
-
     }
   }
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex:1,
     flexDirection: 'column',
-    backgroundColor: '#F9F9F9'
+    backgroundColor: '#FFFFFF',
+    paddingTop: Platform.OS === 'android' ? 0 : 70
   },
   input:{
     height: 50,

@@ -249,19 +249,19 @@ class ChatList extends Component {
     var rebChat = JSON.parse(chat);
 		return (
   		<TouchableHighlight onPress={ () => this.navRebChat(rebChat)} underlayColor="#FFFFFF">
-					<View style={{flex:1, flexDirection: 'row',}}>
-              <View style={{paddingLeft: 10, paddingRight: 5, paddingTop: 10}}>
+					<View style={{flex:1, flexDirection: 'row'}}>
+              <View style={{paddingLeft: 10, paddingRight: 5, paddingTop: 3}}>
                 <Icon name="ios-contact" size={80} color="#CCCCCC"/>
               </View>
               <View>
-                <View style={{height: 25, backgroundColor: '#FFFFFF', width: this.state.width, marginTop: 10}}>
+                <View style={{height: 25, width: this.state.width, marginTop: 10}}>
                   <View style={{flex:1, flexDirection: 'row'}}>
                     <View>
                     <Text style={{fontWeight:'bold'}}>{rebChat.givenName}</Text>
                     </View>
                     <View>
                     {typeof(rebChat.nbUnreadMessage) != "undefined" && rebChat.nbUnreadMessage>0 &&
-                    <Badge minWidth={18} minHeight={18} textStyle={{color: '#fff',}}>
+                    <Badge minWidth={18} minHeight={18} textStyle={{color: '#fff'}}>
                       {rebChat.nbUnreadMessage}
                     </Badge>
                     }

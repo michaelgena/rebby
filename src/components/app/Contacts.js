@@ -33,9 +33,12 @@ class Contacts extends Component {
       hasAccount: false,
       codeSent: false,
       name:"",
+      nameIsEmpty:false,
       phoneNumber:"",
+      invalidPhoneNumber:false,
       code:"",
       codeReceived:"",
+      codeIncorrect:false,
       nbItems:-1,
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2
@@ -93,19 +96,37 @@ class Contacts extends Component {
       this.fetchData();
 
     }else{
-      var code = Math.floor(Math.random() * 9999) + 1000;
-      var url = conf.get().sendPinCode+this.state.phoneNumber+"&text=Hi! Rebby just sent you this pin code: "+code;
-      fetch(url).then((responseData) => {
+      var cleanedPhoneNumber = this.state.phoneNumber.replace(/\D/g, '');
+      var parsedPhoneNumber = parsePhone(cleanedPhoneNumber);
+
+      this.setState({
+        invalidPhoneNumber: parsedPhoneNumber == null,
+        nameIsEmpty: this.state.name == ""
+      });
+
+      if(parsedPhoneNumber != null && !this.state.nameIsEmpty){
+        var code = Math.floor(Math.random() * 9999) + 1000;
+        var url = conf.get().sendPinCode+this.state.phoneNumber+"&text=Hi! Rebby just sent you this pin code: "+code;
+        fetch(url).then((responseData) => {
+          this.setState({
+            codeSent:true,
+            code: code
+          });
+        }).done();
+      }else{
         this.setState({
-          codeSent:true,
-          code: code
+          invalidPhoneNumber: parsedPhoneNumber == null,
+          nameIsEmpty: this.state.name == ""
         });
-      }).done();
+      }
     }
   }
 
   verifyCode(){
     if(this.state.code == this.state.codeReceived){
+      this.setState({
+        codeIncorrect: false
+      });
       //Register Account on dailyglancer
       var url = conf.get().registerAccount+"?name="+this.state.name+"&phoneNumber="+this.state.phoneNumber.replace(/\D/g, '');
       console.log(url);
@@ -131,6 +152,10 @@ class Contacts extends Component {
           console.log("Unable to register account: "+responseData.message);
         }
       }).done();
+    }else{
+      this.setState({
+        codeIncorrect: true
+      });
     }
   }
 
@@ -144,7 +169,7 @@ class Contacts extends Component {
         for(var i=0; i<contacts.length; i++){
           for(var j=0; j<contacts[i].phoneNumbers.length; j++){
             var cleanedPhoneNumber = contacts[i].phoneNumbers[j].number.replace(/\D/g, '');
-            var parsedPhoneNumber = console.log(parsePhone(cleanedPhoneNumber));
+            var parsedPhoneNumber = parsePhone(cleanedPhoneNumber);
             if(parsedPhoneNumber != null){
               if(phoneNumbers == ""){
                 phoneNumbers = cleanedPhoneNumber;
@@ -209,6 +234,9 @@ class Contacts extends Component {
   }
 
   navRebChat(contact){
+    this.setState({
+      isLoading: true
+    });
     //Retrieve the channel token
     var chatList = [];
 
@@ -240,6 +268,9 @@ class Contacts extends Component {
               })
             }
           }
+          this.setState({
+            isLoading: false
+          });    
           return chatAlreadyExist;
         })
         .then((chatAlreadyExist) => {
@@ -263,19 +294,23 @@ class Contacts extends Component {
 
                 chatList.unshift(chatAsString);
                 AsyncStorage.setItem("chatList", chatList.toString());
+                this.setState({
+                  isLoading: false
+                });
                 this.props.navigator.push({
                     id: 'rebChat',
                     title: contact.UsrName,
                     component: RebChat,
                     passProps: {givenName:contact.UsrName, channel:responseData.token},
-                  })
-                }
-              }).done();
-            }
-        }).done();
-      }
-    }).done();
-  }
+                })
+              }
+
+            }).done();
+          }
+      }).done();
+    }
+  }).done();
+}
 
   renderLoadingView() {
     if (Platform.OS === 'ios'){
@@ -332,7 +367,7 @@ class Contacts extends Component {
 
   render() {
     if (this.state.isLoading) {
-         return this.renderLoadingView();
+      return this.renderLoadingView();
     }
     if (Platform.OS === 'android'){
       return (
@@ -353,16 +388,13 @@ class Contacts extends Component {
                         titleColor={'black'}/>
           </View>
           <ScrollView>
-
             </ScrollView>
           </View>
-
         </Animated.View>
       );
     }else{
       if(this.state.hasAccount){
         return (
-          <View>
           <ListView
               refreshControl={
                 <RefreshControl
@@ -374,37 +406,54 @@ class Contacts extends Component {
   						onEndReached={this._onEndReached.bind(this)}
             	style={styles.listView}
             	/>
-              
-          </View>
         );
       }else{
         if(this.state.codeSent){
           return (
             <View style={styles.container}>
+              <Text style={{marginTop:60, marginLeft:10}}>Type the pin code here</Text>
               <TextInput
-                placeholder="Type the pin code here"
                 controlled={true}
-                style={{fontSize: 20, height: 40, marginTop:60, paddingLeft:5, paddingLeft:5}}
+                style={{fontSize: 20, height: 40, marginTop:10, marginLeft:10, marginRight:10, paddingLeft:5, backgroundColor: '#FFFFFF'}}
                 onChangeText={(codeReceived) => this.setState({codeReceived})}
               />
-
-              <Button style={styles.button} onPress={this.verifyCode.bind(this)}>Done</Button>
+              {this.state.codeIncorrect &&
+                <Text style={{marginLeft:10, color: 'red'}}>Your code is incorrect. Please try again.</Text>
+              }
+              <TouchableHighlight onPress={() => this.verifyCode(this)} underlayColor="#FDF058">
+                <View style={{alignItems: 'center',justifyContent:'center', width: this.viewMaxWidth, height: 40,backgroundColor:'#CCCCCC', marginTop:20, marginLeft: 10, marginRight: 10}}>
+                  <Text style={{fontWeight:'800'}}>Done</Text>
+                </View>
+              </TouchableHighlight>
             </View>
           );
         }else{
           return (
             <View style={styles.container}>
-              <Text style={{marginTop:70, marginLeft:5}}>Please fill in these information first...</Text>
+              <Text style={{marginTop:40, marginLeft:10}}>Please fill in these information first:</Text>
+
+              <Text style={{marginTop:20, marginLeft:10}}>Name</Text>
               <TextInput
-                placeholder="Your Name"
                 controlled={true}
-                style={{fontSize: 20, height: 40, marginTop:10, paddingLeft:5, paddingLeft:5}}
+                style={{fontSize: 20, height: 40, marginTop:10, marginLeft:10, marginRight:10, paddingLeft:5, backgroundColor: '#FFFFFF'}}
                 onChangeText={(name) => this.setState({name})}
               />
-              <TelephoneInput placeholder="Your Phone Number" onChangeText={(phoneNumber) => this.setState({phoneNumber})}/>
-
-              <Text style={{marginLeft:5}}>You will receive an SMS containing a pin code</Text>
-              <Button style={styles.button} onPress={() => this.createAccount(this)}>Next</Button>
+              {this.state.nameIsEmpty &&
+                <Text style={{marginLeft:10, color: 'red'}}>The name must be set.</Text>
+              }
+              <Text style={{marginTop:10, marginLeft:10}}>Phone Number</Text>
+              <View style={{ height: 40, marginTop:10, marginLeft:10, marginRight:10, paddingLeft:5, backgroundColor: '#FFFFFF'}}>
+              <TelephoneInput onChangeText={(phoneNumber) => this.setState({phoneNumber})}/>
+              </View>
+              {this.state.invalidPhoneNumber &&
+                <Text style={{marginLeft:10, color: 'red'}}>Your phone number is not well formed, please correct it.</Text>
+              }
+              <TouchableHighlight onPress={() => this.createAccount(this)} underlayColor="#FDF058">
+                <View style={{alignItems: 'center',justifyContent:'center', width: this.viewMaxWidth, height: 40,backgroundColor:'#CCCCCC', marginTop:20, marginLeft: 10, marginRight: 10}}>
+                  <Text style={{fontWeight:'800'}}>Next</Text>
+                </View>
+              </TouchableHighlight>
+              <Text style={{marginLeft:10}}>You will receive a text message containing a pin code.</Text>
             </View>
           );
         }
@@ -416,21 +465,21 @@ class Contacts extends Component {
 const styles = StyleSheet.create({
   container: {
     flex:1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FDF058',
     paddingTop: Platform.OS === 'android' ? 0 : 65,
   },
   button:{
     height: 40,
-    backgroundColor: '#05ABF1',
-    marginLeft: 15,
-    marginRight: 15,
+    backgroundColor: '#CCCCCC',
+    marginLeft: 10,
+    marginRight: 10,
     marginTop:10,
   },
   buttonText:{
     fontSize: 20,
     fontWeight: 'bold',
     justifyContent: 'center',
-    paddingTop:8,
+    paddingTop:15,
     alignItems: 'center',
     color: "#FFFFFF"
   },
