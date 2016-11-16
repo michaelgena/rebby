@@ -78,6 +78,9 @@ class NotificationHandler extends Component {
     console.log('Connected!');
     console.log('Trying to subscribe...');
     RCTRealtimeMessaging.RTSubscribeWithNotifications(userToken, true);
+
+    //Global channel
+    RCTRealtimeMessaging.RTSubscribeWithNotifications("all", true);
     //RCTRealtimeMessaging.RTSubscribe(userToken, true);
     //console.log('Subscribed on Channel '+userToken);
   }
@@ -180,21 +183,3 @@ class NotificationHandler extends Component {
   }
 }
 module.exports = NotificationHandler;
-
-/*{
-   "applicationKey": "xkCY9Z",
-   "privateKey": "oQcrOlauio9V",
-   "channel" : "24890663b4e4c91b670041b065007c73",
-   "message" : "Mike says:\nTh🏝-land 🏝-land 🐋-ammal+y R🍳-gg+b!",
-   "payload" : "{
-   	 \"sound\" : \"default\",
-     \"badge\" : \"1\",
-     \"UsrToken\" : \"24890663b4e4c91b670041b065007c73\",
-     \"UsrName\" : \"Mike\",
-     \"date\" : \"1478126072129\",
-     \"channel\" : \"9054d3c8ee53973c17ec316fdf10a433\",
-     \"message\" : \"Th🏝-land 🏝-land 🐋-ammal+y R🍳-gg+b!\",
-     \"text\" : \"This is my Reb!\",
-     \"language\" : \"EN\"
-    }"
-}*/

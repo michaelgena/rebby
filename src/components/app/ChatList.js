@@ -171,113 +171,6 @@ class ChatList extends Component {
     this.fetchData();
   }
 
-  render() {
-    //AsyncStorage.removeItem("myRebs");
-    //AsyncStorage.removeItem("isOnBoarding");
-    if (this.state.isLoading) {
-         return this.renderLoadingView();
-    }
-    if (Platform.OS === 'android'){
-      return (
-          <View style={{flex: 1}}>
-            <Icon.ToolbarAndroid style={styles.toolbar}
-                    title="Home"
-                    titleColor={'black'}
-                    actions={toolbarActions}
-                    onActionSelected={this._onActionSelected.bind(this)}/>
-          <View style={styles.container}>
-       		<ListView
-              refreshControl={
-                <RefreshControl
-                refreshing={this.state.reloading}
-                onRefresh={this._onRefresh.bind(this)}/>
-              }
-            	dataSource={this.state.dataSource}
-            	renderRow={this.renderChat.bind(this)}
-  						onEndReached={this._onEndReached.bind(this)}
-            	style={styles.listView}
-            	/>
-          </View>
-        </View>
-      );
-    }else{
-      return (
-        <View style={{flex: 1}}>
-       		<ListView
-              refreshControl={
-                <RefreshControl
-                refreshing={this.state.reloading}
-                onRefresh={this._onRefresh.bind(this)}/>
-              }
-            	dataSource={this.state.dataSource}
-            	renderRow={this.renderChat.bind(this)}
-  						onEndReached={this._onEndReached.bind(this)}
-            	style={styles.listView}
-            	/>
-            <NotificationHandler addOneToBadge={this.addOneToBadge.bind(this)} refreshChatList={this.refreshChatList.bind(this)}/>
-          </View>
-      );
-    }
-	}
-
-	renderLoadingView() {
-    if (Platform.OS === 'ios'){
-      return (
-      	<View style={styles.loading}>
-          <Spinner size='large' visible={true} overlayColor="#FDF058"/>
-      	</View>
-  	  );
-    }else{
-      return null;
-    }
-	}
-
-	renderChat(chat) {
-    if(this.state.nbItems == 0){
-      console.log("Empty");
-      return (
-  					<View style={{flex:1}}>
-  							 <View style={{alignItems: 'center',justifyContent:'center', width: this.state.width, height: 50,backgroundColor:'#CCCCCC'}}>
-  									<Text style={{color:'#ffffff',fontWeight:'800',}} numberOfLines={1}>No Chat list to display for now. Pull to refresh.</Text>
-  							</View>
-  							<View style={styles.separator} />
-  					</View>
-  		);
-    }
-    chat = chat.replace(/\|/g , ",");
-    chat = chat.replace(/\\"/g , "\"");
-    var rebChat = JSON.parse(chat);
-		return (
-  		<TouchableHighlight onPress={ () => this.navRebChat(rebChat)} underlayColor="#FFFFFF">
-					<View style={{flex:1, flexDirection: 'row'}}>
-              <View style={{paddingLeft: 10, paddingRight: 5, paddingTop: 3}}>
-                <Icon name="ios-contact" size={80} color="#CCCCCC"/>
-              </View>
-              <View>
-                <View style={{height: 25, width: this.state.width, marginTop: 10}}>
-                  <View style={{flex:1, flexDirection: 'row'}}>
-                    <View>
-                    <Text style={{fontWeight:'bold'}}>{rebChat.givenName}</Text>
-                    </View>
-                    <View>
-                    {typeof(rebChat.nbUnreadMessage) != "undefined" && rebChat.nbUnreadMessage>0 &&
-                    <Badge minWidth={18} minHeight={18} textStyle={{color: '#fff'}}>
-                      {rebChat.nbUnreadMessage}
-                    </Badge>
-                    }
-                    </View>
-                  </View>
-                </View>
-						    <View style={{width: this.state.width-80}}>
-									<Text style={ Platform.OS === 'ios' ? styles.rebus : styles.rebusAndroid} numberOfLines={1}>{rebChat.lastMessage}</Text>
-							  </View>
-							  <View style={styles.separator} />
-              </View>
-					</View>
-			</TouchableHighlight>
-		);
-  }
-
   componentWillMount() {
 
   }
@@ -291,6 +184,7 @@ class ChatList extends Component {
       //console.log("Rebs: "+rebs);
       if(chats !== null){
         chats = chats.split(",");
+        this.addRebbot(chats);
         this.state.nbItems = chats.length;
         console.log("Chats Length: "+this.state.nbItems);
 
@@ -300,9 +194,9 @@ class ChatList extends Component {
           reloading: false
         });
       }else{
-        console.log("it's empty");
         var chats = [];
-        chats.push("{\"status\":\"empty\"}");
+        this.state.nbItems = 1;
+        this.addRebbot(chats);
         this.setState({
           dataSource: this.state.dataSource.cloneWithRows(chats),
           isLoading: false,
@@ -310,6 +204,53 @@ class ChatList extends Component {
         });
       }
     }).done();
+  }
+
+  addRebbot(chatList){
+    var index = -1;
+    for(var i=0; i<chatList.length; i++){
+      chatAsJSON = this.asyncDataToJSON(chatList[i]);
+      if(chatAsJSON.usrToken == "rebbot"){
+        index = i;
+        break;
+      }
+    }
+    if(index == -1){
+      var chat = {};
+      chat.givenName = "Rebbot";
+      chat.usrToken = "rebbot";
+      chat.lastMessage = "H🅰ve ⛽-el+n! ♥";
+      chat.lastDate = Date.now();
+      chat.channel = "rebbot";
+      chat.nbUnreadMessage = 4;
+      var chatAsString = JSON.stringify(chat);
+      chatAsString = chatAsString.replace(/,/g , "|");
+      chatAsString = chatAsString.replace(/"/g , "\\\"");
+      chatList.unshift(chatAsString);
+
+      var rebs = [];
+      this.addRebbotMessage(rebs, "Hi! I'm Rebbot. I'm here to help you use Rebby.");
+      this.addRebbotMessage(rebs, "You can create a Reb then share it with your friends");
+      this.addRebbotMessage(rebs, "Or chat directly with your contacts.");
+      this.addRebbotMessage(rebs, "H🅰ve ⛽-el+n! ♥ ");
+      AsyncStorage.setItem("rebbot", rebs.toString());
+      AsyncStorage.setItem("chatList", chatList.toString());
+      this.props.addOneToBadge();
+    }
+  }
+
+  addRebbotMessage(rebs, message){
+    var reb = {};
+    reb.text = message;
+    reb.rebus = message;
+    reb.date = Date.now();
+    reb.language = "EN";
+    reb.in = true;
+    var rebAsString = JSON.stringify(reb);
+    rebAsString = rebAsString.replace(/,/g , "|");
+    rebAsString = rebAsString.replace(/"/g , "\\\"");
+    rebs.push(rebAsString);
+    return rebs;
   }
 
   _onRefresh() {
@@ -409,5 +350,116 @@ class ChatList extends Component {
     }
   }
 
+  render() {
+    //AsyncStorage.removeItem("myRebs");
+    //AsyncStorage.removeItem("isOnBoarding");
+    if (this.state.isLoading) {
+         return this.renderLoadingView();
+    }
+    if (Platform.OS === 'android'){
+      return (
+          <View style={{flex: 1}}>
+            <Icon.ToolbarAndroid style={styles.toolbar}
+                    title="Home"
+                    titleColor={'black'}
+                    actions={toolbarActions}
+                    onActionSelected={this._onActionSelected.bind(this)}/>
+          <View style={styles.container}>
+       		<ListView
+              refreshControl={
+                <RefreshControl
+                refreshing={this.state.reloading}
+                onRefresh={this._onRefresh.bind(this)}/>
+              }
+            	dataSource={this.state.dataSource}
+            	renderRow={this.renderChat.bind(this)}
+  						onEndReached={this._onEndReached.bind(this)}
+            	style={styles.listView}
+            	/>
+          </View>
+        </View>
+      );
+    }else{
+      return (
+        <View style={{flex: 1}}>
+       		<ListView
+              refreshControl={
+                <RefreshControl
+                refreshing={this.state.reloading}
+                onRefresh={this._onRefresh.bind(this)}/>
+              }
+            	dataSource={this.state.dataSource}
+            	renderRow={this.renderChat.bind(this)}
+  						onEndReached={this._onEndReached.bind(this)}
+            	style={styles.listView}
+            	/>
+            <NotificationHandler addOneToBadge={this.addOneToBadge.bind(this)} refreshChatList={this.refreshChatList.bind(this)}/>
+          </View>
+      );
+    }
+	}
+
+	renderLoadingView() {
+    if (Platform.OS === 'ios'){
+      return (
+      	<View style={styles.loading}>
+          <Spinner size='large' visible={true} overlayColor="#FDF058"/>
+      	</View>
+  	  );
+    }else{
+      return null;
+    }
+	}
+
+	renderChat(chat) {
+    if(this.state.nbItems == 0){
+      console.log("Empty");
+      return (
+  					<View style={{flex:1}}>
+  							 <View style={{alignItems: 'center',justifyContent:'center', width: this.state.width, height: 50,backgroundColor:'#CCCCCC'}}>
+  									<Text style={{color:'#ffffff',fontWeight:'800',}} numberOfLines={1}>No Chat list to display for now. Pull to refresh.</Text>
+  							</View>
+  							<View style={styles.separator} />
+  					</View>
+  		);
+    }
+    chat = chat.replace(/\|/g , ",");
+    chat = chat.replace(/\\"/g , "\"");
+    var rebChat = JSON.parse(chat);
+		return (
+  		<TouchableHighlight onPress={ () => this.navRebChat(rebChat)} underlayColor="#FFFFFF">
+					<View style={{flex:1, flexDirection: 'row'}}>
+              <View style={{paddingLeft: 10, paddingRight: 5, paddingTop: 3}}>
+                {rebChat.usrToken == "rebbot" &&
+                <Image style={styles.image} source={require('../../img/rebbot.png')}/>
+                }
+                {rebChat.usrToken != "rebbot" &&
+                <Icon name="ios-contact" size={60} color="#CCCCCC"/>
+                }
+              </View>
+              <View>
+                <View style={{height: 25, width: this.state.width, marginTop: 10}}>
+                  <View style={{flex:1, flexDirection: 'row'}}>
+                    <View>
+                    <Text style={{fontWeight:'bold'}}>{rebChat.givenName}</Text>
+                    </View>
+                    <View>
+                    {typeof(rebChat.nbUnreadMessage) != "undefined" && rebChat.nbUnreadMessage>0 &&
+                    <Badge minWidth={18} minHeight={18} textStyle={{color: '#fff'}}>
+                      {rebChat.nbUnreadMessage}
+                    </Badge>
+                    }
+                    </View>
+                  </View>
+                </View>
+						    <View style={{width: this.state.width-80}}>
+									<Text style={ Platform.OS === 'ios' ? styles.rebus : styles.rebusAndroid} numberOfLines={1}>{rebChat.lastMessage}</Text>
+							  </View>
+							  <View style={styles.separator} />
+              </View>
+					</View>
+			</TouchableHighlight>
+		);
+  }
 }
 module.exports = ChatList;

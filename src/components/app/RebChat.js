@@ -51,6 +51,10 @@ class RebChat extends Component {
        })
     };
 
+    this._currentPageIndex = 1;
+    this._hasNextPage = true;
+    this._messages = [];
+
     RCTRealtimeMessaging.RTEventListener("onConnected",this._onConnected.bind(this)),
     //RCTRealtimeMessaging.RTEventListener("onDisconnected",this._onDisconnected),
     RCTRealtimeMessaging.RTEventListener("onSubscribed",this._onSubscribed.bind(this)),
@@ -90,7 +94,7 @@ class RebChat extends Component {
   componentDidUpdate(){
     if(this.state.footerY > this.state.listHeight && !this.state.reloaded){
       var scrollDistance = this.state.listHeight - this.state.footerY;
-      this.refs.list.getScrollResponder().scrollTo({x:0,y:-scrollDistance, animated: false});
+      this.refs.list.getScrollResponder().scrollTo({x:0,y:-scrollDistance, animated: true});
     }
   }
 
@@ -112,10 +116,6 @@ class RebChat extends Component {
     //this._log("Exception:" + exceptionEvent.error);
     console.log("Exception:" + exceptionEvent.error);
   }
-
-  /*doSendMessage(message){
-    RCTRealtimeMessaging.RTSendMessage(message, this.state.channel);
-  }*/
 
   _onMessage(messageEvent){
     console.log("received message on RebChat: ["+messageEvent.message+"] on channel [" + messageEvent.channel+"]");
@@ -162,16 +162,29 @@ class RebChat extends Component {
       reloading: true,
       reloaded: true
     });
-    this.fetchData();
+    var messages = this._messages;
+    if(messages !== null){
+      if(messages.length > this._currentPageIndex * 10){
+        messages = messages.slice(Math.max(messages.length - this._currentPageIndex * 10, 0));
+        this._currentPageIndex ++;
+      }
+
+      this.setState({
+        dataSource: this.state.dataSource.cloneWithRows(messages),
+        reloading: false
+      });
+    }
   }
 
   fetchData() {
     AsyncStorage.getItem(this.state.channel).then((messages) => {
-      //TODO load only last 10 messages
       if(messages !== null){
         messages = messages.split(",");
+        this._messages = messages;
+        if(messages.length > 10){
+          messages = messages.slice(Math.max(messages.length - 10, 0));
+        }
         this.state.nbItems = messages.length;
-        console.log("Messages Length: "+this.state.nbItems);
 
         this.setState({
           dataSource: this.state.dataSource.cloneWithRows(messages),
@@ -206,7 +219,7 @@ class RebChat extends Component {
 
   onKeyboardDidShow(e) {
     Animated.timing(this.state.height, {
-        toValue: this.viewMaxHeight - 120,
+        toValue: this.viewMaxHeight - (e.endCoordinates.height/2 - 10),
         duration: 200,
       }).start();
   }

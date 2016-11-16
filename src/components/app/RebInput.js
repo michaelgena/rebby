@@ -1,9 +1,7 @@
 'use strict';
 import React, { Component } from 'react';
 import { View, Text, StyleSheet,TextInput,TouchableHighlight, ScrollView, PixelRatio, Animated, Navigator, Dimensions, Platform, AsyncStorage, ToolbarAndroid} from 'react-native';
-//import { Actions } from 'react-native-router-flux';
 import Button from 'react-native-button';
-import dismissKeyboard from 'dismissKeyboard';
 var ExpandingTextInput = require("./ExpandingTextInput");
 var Clipboard = require('react-native-clipboard');
 var KDSocialShare = require('NativeModules').KDSocialShare;
@@ -12,7 +10,7 @@ var MessageBarManager = require('react-native-message-bar').MessageBarManager;
 import Icon from 'react-native-vector-icons/Ionicons';
 import realtimeIOS from '../../../RCTRealtimeMessagingIOS';
 var RCTRealtimeMessaging;
-
+import dismissKeyboard from 'dismissKeyboard';
 var dataEN = require("../../data/EN.js");
 var dataFR = require("../../data/FR.js");
 var jsonEN = dataEN.get();
@@ -120,6 +118,29 @@ class RebInput extends Component {
     MessageBarManager.unregisterMessageBar();
   }
 
+  onKeyboardDidShow(e) {
+    if (Platform.OS === 'ios'){
+      Animated.timing(this.state.height, {
+          toValue: this.viewMaxHeight - e.endCoordinates.height,
+          duration: 200,
+        }).start();
+    }
+    if (Platform.OS === 'android'){
+      Animated.timing(this.state.height, {
+          toValue: e.endCoordinates.height,
+          duration: 200,
+        }).start();
+    }
+  }
+
+  onKeyboardDidHide(e){
+    Animated.timing(this.state.height, {
+        toValue: this.viewMaxHeight,
+        duration: 200,
+      }).start();
+
+  }
+
   buttonClicked() {
       dismissKeyboard();
       if(this.state.rebus != ""){
@@ -192,30 +213,6 @@ class RebInput extends Component {
     });
   }
 
-  onKeyboardDidShow(e) {
-    if (Platform.OS === 'ios'){
-      Animated.timing(this.state.height, {
-          toValue: this.viewMaxHeight - e.endCoordinates.height,
-          duration: 200,
-        }).start();
-    }
-    if (Platform.OS === 'android'){
-      Animated.timing(this.state.height, {
-          toValue: e.endCoordinates.height,
-          duration: 200,
-        }).start();
-    }
-  }
-
-  onKeyboardDidHide(e){
-    Animated.timing(this.state.height, {
-        toValue: this.viewMaxHeight,
-        duration: 200,
-      }).start();
-
-  }
-
-
   render() {
     if(Platform.OS === 'android'){
       return (
@@ -226,9 +223,6 @@ class RebInput extends Component {
           }}
         >
         <View style={styles.container}>
-
-
-
               <View style={{flex:1, flexDirection: 'row',}}>
                 <View style={{width:60}}/>
                 <View style={{flex:1, flexDirection: 'column',}}>
@@ -236,8 +230,6 @@ class RebInput extends Component {
                   <View style={styles.triangleCorner} />
                 </View>
               </View>
-
-
             <View style={styles.textPlaceContainer}>
               <View style={styles.textInputContainer}>
                 <Button
@@ -299,8 +291,8 @@ class RebInput extends Component {
                 {this.state.language}
                 </Button>
                 <ExpandingTextInput
+                  onChangeText={(text) => {this.setState({text});this.generate(text)}}
                   value={this.state.text}
-                  onChangeText={(text) => {this.generate(text)}}
                   controlled={true}
                   placeholder="Your text here..."
                   autoCorrect={true}
@@ -340,7 +332,7 @@ class RebInput extends Component {
 
   generate(text) {
 
-    this.state.text = text;
+    //this.state.text = text;
 
     if(this.props.isReb){
       this.props.resetData();

@@ -37,9 +37,8 @@ class NewReb extends Component {
   }
 
   onKeyboardDidShow(e) {
-    console.log("Keyboard did show.");
     Animated.timing(this.state.height, {
-        toValue: this.viewMaxHeight - 120,
+        toValue: this.viewMaxHeight - (e.endCoordinates.height/2 - 10),
         duration: 200,
       }).start();
   }
