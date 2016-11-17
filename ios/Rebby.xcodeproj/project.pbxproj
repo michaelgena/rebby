@@ -26,6 +26,8 @@
 		1E542CCDD1824D4E81D7A3E4 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 008DD04EE45046EBAC8AE1B1 /* FontAwesome.ttf */; };
 		2A9B7FF9D9E741D5A87AC25B /* Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F4482C09011D4C9D9D73CD7A /* Foundation.ttf */; };
 		36D503CB6E364785AE0894AD /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 63A9B599C8674E038C6E42F7 /* Octicons.ttf */; };
+		5A1CDE691DDB6F720086C900 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A1CDE681DDB6F720086C900 /* Social.framework */; };
+		5AE6BC771DDCAEA5009C11CF /* KDSocialShare.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE6BC761DDCAEA5009C11CF /* KDSocialShare.m */; };
 		5AFC17821D99C2E600DAD03C /* libRCTRealtimeMessaging.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A8D89F01D945E8F00D915C6 /* libRCTRealtimeMessaging.a */; };
 		5AFC17831D99C2E600DAD03C /* libRNClipboard.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A8D89FA1D945E8F00D915C6 /* libRNClipboard.a */; };
 		5AFC17841D99C2E600DAD03C /* libRNShare.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A8D89FF1D945E8F00D915C6 /* libRNShare.a */; };
@@ -193,6 +195,9 @@
 		418FB01D16104839BBC537FC /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		487BB7DCFBF14C3E889E4423 /* Zocial.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Zocial.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Zocial.ttf"; sourceTree = "<group>"; };
 		51CDA6243A814D99B072D6A4 /* ReactNativeSocialShare.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = ReactNativeSocialShare.xcodeproj; path = "../node_modules/react-native-social-share/ReactNativeSocialShare.xcodeproj"; sourceTree = "<group>"; };
+		5A1CDE681DDB6F720086C900 /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
+		5AE6BC751DDCAEA5009C11CF /* KDSocialShare.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KDSocialShare.h; path = "../node_modules/react-native-social-share/iOS/KDSocialShare.h"; sourceTree = "<group>"; };
+		5AE6BC761DDCAEA5009C11CF /* KDSocialShare.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KDSocialShare.m; path = "../node_modules/react-native-social-share/iOS/KDSocialShare.m"; sourceTree = "<group>"; };
 		5AFC17FA1D9C42F700DAD03C /* Rebby.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Rebby.entitlements; path = Rebby/Rebby.entitlements; sourceTree = "<group>"; };
 		5AFC17FB1D9C437600DAD03C /* AppDelegate+RealtimeRCTPushNotifications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "AppDelegate+RealtimeRCTPushNotifications.h"; path = "../node_modules/react-native-realtimemessaging-ios/RCTRealtimeMessaging/AppDelegate+RealtimeRCTPushNotifications.h"; sourceTree = "<group>"; };
 		5AFC17FC1D9C437600DAD03C /* AppDelegate+RealtimeRCTPushNotifications.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "AppDelegate+RealtimeRCTPushNotifications.m"; path = "../node_modules/react-native-realtimemessaging-ios/RCTRealtimeMessaging/AppDelegate+RealtimeRCTPushNotifications.m"; sourceTree = "<group>"; };
@@ -223,6 +228,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A1CDE691DDB6F720086C900 /* Social.framework in Frameworks */,
 				5AFC17821D99C2E600DAD03C /* libRCTRealtimeMessaging.a in Frameworks */,
 				5AFC17831D99C2E600DAD03C /* libRNClipboard.a in Frameworks */,
 				5AFC17841D99C2E600DAD03C /* libRNShare.a in Frameworks */,
@@ -357,6 +363,14 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		5A1CDE671DDB6F720086C900 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5A1CDE681DDB6F720086C900 /* Social.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		5A55032D1D9C6B61004B2F69 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -417,6 +431,8 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				5AE6BC751DDCAEA5009C11CF /* KDSocialShare.h */,
+				5AE6BC761DDCAEA5009C11CF /* KDSocialShare.m */,
 				146833FF1AC3E56700842450 /* React.xcodeproj */,
 				00C302A71ABCB8CE00DB3ED1 /* RCTActionSheet.xcodeproj */,
 				00C302B51ABCB90400DB3ED1 /* RCTGeolocation.xcodeproj */,
@@ -453,6 +469,7 @@
 				00E356EF1AD99517003FC87E /* RebbyTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				323E1F2E7D1D44438ED43C80 /* Resources */,
+				5A1CDE671DDB6F720086C900 /* Frameworks */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -517,10 +534,13 @@
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
+						DevelopmentTeam = 6M55NJBHDW;
+						ProvisioningStyle = Manual;
 						TestTargetID = 13B07F861A680F5B00A75B9A;
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = 6M55NJBHDW;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -799,6 +819,7 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				5AFC17FD1D9C437600DAD03C /* AppDelegate+RealtimeRCTPushNotifications.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				5AE6BC771DDCAEA5009C11CF /* KDSocialShare.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -829,6 +850,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				DEVELOPMENT_TEAM = 6M55NJBHDW;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -855,7 +878,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = 6M55NJBHDW;
 				INFOPLIST_FILE = RebbyTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -879,6 +904,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Rebby/Rebby.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = 6M55NJBHDW;
 				HEADER_SEARCH_PATHS = (
@@ -893,6 +919,7 @@
 					"$(SRCROOT)/../node_modules/react-native-contacts/ios/RCTContacts",
 				);
 				INFOPLIST_FILE = Rebby/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -901,6 +928,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.dailyglancer.Rebby;
 				PRODUCT_NAME = Rebby;
+				PROVISIONING_PROFILE = "bf1f4fa5-f011-48a8-91e1-4046730e4bed";
+				PROVISIONING_PROFILE_SPECIFIER = Adhoc;
 			};
 			name = Debug;
 		};
@@ -909,6 +938,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Rebby/Rebby.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				DEVELOPMENT_TEAM = 6M55NJBHDW;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -922,6 +952,7 @@
 					"$(SRCROOT)/../node_modules/react-native-contacts/ios/RCTContacts",
 				);
 				INFOPLIST_FILE = Rebby/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -930,6 +961,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.dailyglancer.Rebby;
 				PRODUCT_NAME = Rebby;
+				PROVISIONING_PROFILE = "bf1f4fa5-f011-48a8-91e1-4046730e4bed";
+				PROVISIONING_PROFILE_SPECIFIER = Adhoc;
 			};
 			name = Release;
 		};

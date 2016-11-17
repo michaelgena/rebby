@@ -55,21 +55,21 @@ class RebChat extends Component {
     this._hasNextPage = true;
     this._messages = [];
 
-    RCTRealtimeMessaging.RTEventListener("onConnected",this._onConnected.bind(this)),
+    //RCTRealtimeMessaging.RTEventListener("onConnected",this._onConnected.bind(this)),
     //RCTRealtimeMessaging.RTEventListener("onDisconnected",this._onDisconnected),
-    RCTRealtimeMessaging.RTEventListener("onSubscribed",this._onSubscribed.bind(this)),
+    //RCTRealtimeMessaging.RTEventListener("onSubscribed",this._onSubscribed.bind(this)),
     //RCTRealtimeMessaging.RTEventListener("onUnSubscribed",this._onUnSubscribed),
-    RCTRealtimeMessaging.RTEventListener("onException",this._onException),
-    RCTRealtimeMessaging.RTEventListener("onMessage",this._onMessage.bind(this));
+    //RCTRealtimeMessaging.RTEventListener("onException",this._onException),
+    //RCTRealtimeMessaging.RTEventListener("onMessage",this._onMessage.bind(this));
     //RCTRealtimeMessaging.RTEventListener("onPresence",this._onPresence);
 
-    RCTRealtimeMessaging.RTConnect(
+    /*RCTRealtimeMessaging.RTConnect(
     {
       appKey: this.state.appKey,
       token: this.state.token,
       connectionMetadata: this.state.connectionMetadata,
       clusterUrl: this.state.clusterUrl
-    });
+    });*/
 
     AsyncStorage.getItem("userInfo").then((userInfo) => {
       if(userInfo != null){
@@ -102,22 +102,22 @@ class RebChat extends Component {
 
   }
 
-  _onConnected(){
+  /*_onConnected(){
     console.log('Connected!');
     console.log('Trying to subscribe...');
     RCTRealtimeMessaging.RTSubscribeWithNotifications(this.state.channel, true);
-  }
+  }*/
 
-  _onSubscribed(subscribedEvent){
+  /*_onSubscribed(subscribedEvent){
     console.log('Subscribed!');
-  }
+  }*/
 
-  _onException(exceptionEvent){
+  /*_onException(exceptionEvent){
     //this._log("Exception:" + exceptionEvent.error);
     console.log("Exception:" + exceptionEvent.error);
-  }
+  }*/
 
-  _onMessage(messageEvent){
+  /*_onMessage(messageEvent){
     console.log("received message on RebChat: ["+messageEvent.message+"] on channel [" + messageEvent.channel+"]");
 
     AsyncStorage.getItem(this.state.channel).then((messages) => {
@@ -155,7 +155,7 @@ class RebChat extends Component {
         });
       }
     }).done();
-  }
+  }*/
 
   _onRefresh() {
     this.setState({

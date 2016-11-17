@@ -57,6 +57,7 @@ class NotificationHandler extends Component {
         result = result.replace(/\\"/g , "\"");
         var userInfoAsJSON = JSON.parse(result);
         userToken = userInfoAsJSON.token;
+        this.getMessages();
         RCTRealtimeMessaging.RTConnect(
         {
           channel: userToken,
@@ -107,8 +108,29 @@ class NotificationHandler extends Component {
     return result;
   }
 
-  _onNotification(data){
-    console.log("Received notification: " + JSON.stringify(data));
+  getMessages(){
+    var url = conf.get().getMessage+"?token="+userToken;
+    console.log("url to get messages: "+url);
+
+    fetch(conf.get().getMessage+"?token="+userToken).then((response) => response.json())
+    .then((responseData) => {
+      if(responseData.status == "OK"){
+        if(typeof(responseData.messages) != "undefined"){
+          var messages = responseData.messages;
+          for(var i=0; i<messages.length; i++){
+            var message = messages[i].replace(/\\"/g , "\"");
+            var json = JSON.parse(message);
+            this.saveMessage(json);
+          }
+        }
+      }else{
+        console.log("Unable to get messages: "+JSON.stringify(responseData));
+      }
+    }).done();
+  }
+
+  saveMessage(data){
+    console.log("Received message: " + JSON.stringify(data));
 
     var chatList = [];
     var nbUnreadMessage = 0;
@@ -172,6 +194,11 @@ class NotificationHandler extends Component {
         AsyncStorage.setItem(data.channel, rebs.toString());
       }
     }).done();
+  }
+
+  _onNotification(data){
+    console.log("Received notification: " + JSON.stringify(data));
+    this.getMessages();
   }
 
   _onMessage(messageEvent){
