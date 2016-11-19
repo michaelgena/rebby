@@ -408,7 +408,7 @@ class RebInput extends Component {
     text = text.replace(/ +(?= )/g,'');
     this.state.currentText = text;
     var rebusObj = {};
-    var textArray = text.split(" ");
+    var textArray = text.trim().split(" ");
     var i = 0;
 
     rebusObj.nbSpace = textArray.length - 1;
@@ -443,8 +443,10 @@ class RebInput extends Component {
 
             rebusObjTemp1.nbSpace = rebusObj.nbSpace;
             rebusObjTemp1.word = rebusObj.initialWord;
+            rebusObjTemp1.fullWord = rebusObj.fullWord;
             rebusObjTemp2.nbSpace = rebusObj.nbSpace;
             rebusObjTemp2.word = rebusObj.initialWord;
+            rebusObjTemp2.fullWord = rebusObj.fullWord;
 
             rebusObjTemp1.prev = rebusObjTemp1.word.charAt(0);
             rebusObjTemp1.word = rebusObjTemp1.word.substring(1,rebusObjTemp1.word.length);
@@ -499,10 +501,10 @@ class RebInput extends Component {
           rebusObj.rebus = "";
         }
 
-        if(this.state.currentText.length >= this.state.previousText.length){
+        /*if(this.state.currentText.length >= this.state.previousText.length){
           var rebusObjJSON = JSON.parse(JSON.stringify(rebusObj));
           this.state.rebusArray.push(rebusObjJSON);
-        }
+        }*/
         rebusObj.word = "";
         rebusObj.initialWord = "";
         rebusObj.fullWord = "";
@@ -518,7 +520,7 @@ class RebInput extends Component {
       if(this.state.rebus !== ""){
           this.state.rebus += "\u2000";
       }
-      this.state.rebus += this.buildRebus(this.state.rebusArray[r]);
+      this.state.rebus += this.buildRebus(this.state.rebusArray[r], true);
     }
     this.state.previousText = text;
 
@@ -526,10 +528,10 @@ class RebInput extends Component {
     return this.state.rebus;
   }
 
-  buildRebus(rebusArray){
+  buildRebus(rebusArray, replace){
 
     //if the user chose another rebus then replace the standard by it
-    if(typeof(this.userSelection[rebusArray.fullWord]) !== "undefined"){
+    if(replace && typeof(this.userSelection[rebusArray.fullWord]) !== "undefined"){
       var userSelection = this.userSelection[rebusArray.fullWord];
       //console.log("userSelection:"+JSON.stringify(userSelection));
       rebusArray = userSelection;
@@ -594,7 +596,7 @@ class RebInput extends Component {
                   obj.delta = delta;
                 }
                 this.state.suggest1 = clone(obj);
-                this.state.suggest1.display = this.buildRebus(obj);
+                this.state.suggest1.display = this.buildRebus(obj, false);
               }
             }
             if(json[char].length>j+2){
@@ -606,7 +608,7 @@ class RebInput extends Component {
                   obj.delta = delta;
                 }
                 this.state.suggest2 = clone(obj);
-                this.state.suggest2.display = this.buildRebus(obj);
+                this.state.suggest2.display = this.buildRebus(obj, false);
               }
             }
             if(json[char].length>j+3){
@@ -618,7 +620,7 @@ class RebInput extends Component {
                   obj.delta = delta;
                 }
                 this.state.suggest3 = clone(obj);
-                this.state.suggest3.display = this.buildRebus(obj);
+                this.state.suggest3.display = this.buildRebus(obj, false);
               }
             }
             break;
@@ -666,7 +668,7 @@ class RebInput extends Component {
     //console.log("reb:"+rebusObjJSON);
 
     this.state.rebusArray.pop();
-    this.state.rebusArray.pop();
+    //this.state.rebusArray.pop();
     this.state.rebusArray.push(rebusObjJSON);
 
     /*if(this.state.rebusArray.length>0 && this.state.rebusArray[this.state.rebusArray.length-1].nbSpace == obj.nbSpace && this.state.currentText.length >= this.state.previousText.length && typeof(obj.i) !== "undefined"){
@@ -680,7 +682,7 @@ class RebInput extends Component {
       if(rebus !== ""){
           rebus += " ";
       }
-      rebus += this.buildRebus(this.state.rebusArray[r]);
+      rebus += this.buildRebus(this.state.rebusArray[r], true);
     }
     this.setState({
         rebus: rebus
