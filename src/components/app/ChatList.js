@@ -1,13 +1,14 @@
 //'use strict';
 
 import React, { Component } from 'react';
-import { View, Text, StyleSheet,ListView,TouchableHighlight,ActivityIndicatorIOS, AsyncStorage, Platform, ToolbarAndroid, Dimensions, RefreshControl, Image, ScrollView, Animated } from 'react-native';
+import { View, Text, StyleSheet,ListView,TouchableHighlight,ActivityIndicatorIOS, AsyncStorage, Platform, ToolbarAndroid, Dimensions, RefreshControl, Image, ScrollView, Animated, AppState } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import RebChat from './RebChat';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Badge from 'react-native-smart-badge';
 import NotificationHandler from './NotificationHandler';
-
+var userToken = "";
+var conf = require("../../data/conf.js");
 var styles = StyleSheet.create({
     container: {
       flex:1,
@@ -55,7 +56,7 @@ var styles = StyleSheet.create({
       height: 50,
       width: 50,
       borderRadius: 25,
-      margin: 5,
+      marginTop: 5,
       alignSelf: 'center',
     },
     nickname:{
@@ -146,6 +147,7 @@ class ChatList extends Component {
         isOnBoarding: true,
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height-20,
+        networkError: false,
         dataSource: new ListView.DataSource({
       		rowHasChanged: (row1, row2) => row1 !== row2
       	})
@@ -174,9 +176,151 @@ class ChatList extends Component {
   componentWillMount() {
 
   }
+  componentWillUnmount() {
+    AppState.removeEventListener('change', this._handleAppStateChange);
+  }
 
   componentDidMount() {
+    AppState.addEventListener('change', this._handleAppStateChange.bind(this));
+    AsyncStorage.getItem("userInfo").then((result) => {
+      if(result != null){
+        result = result.replace(/\|/g , ",");
+        result = result.replace(/\\"/g , "\"");
+        var userInfoAsJSON = JSON.parse(result);
+        userToken = userInfoAsJSON.token;
+        this.getMessages();
+      }
+    }).done();
+  }
+  _handleAppStateChange(currentAppState){
+    if(currentAppState == "active"){
+      this.getMessages();
+    }
+  }
 
+  getMessages(){
+    var url = conf.get().getMessage+"?token="+userToken;
+    //console.log("url to get messages: "+url);
+
+    fetch(conf.get().getMessage+"?token="+userToken).then((response) => response.json())
+    .then((responseData) => {
+      if(responseData.status == "OK"){
+        if(typeof(responseData.messages) != "undefined"){
+          var messages = responseData.messages;
+          this.updateChatList(messages);
+          this.saveMessage(messages);
+        }else{
+          this.setState({
+            isLoading: false,
+            reloading: false
+          });
+        }
+      }else{
+        console.log("Unable to get messages: "+JSON.stringify(responseData));
+      }
+    })
+    .catch((error) => {
+      this.setState({
+        networkError: true
+      });
+      console.error(error);
+    }).done();
+  }
+
+  updateChatList(messages){
+    //console.log("Received messages: " + JSON.stringify(messages));
+    //Update the chat list
+    var chatList = [];
+    var nbUnreadMessage = 0;
+    AsyncStorage.getItem("chatList").then((chats) => {
+      if(chats !== null){
+        chatList = chats.split(",");
+      }
+      for(var m=0; m<messages.length; m++){
+        var message = messages[m].replace(/\\"/g , "\"");
+        var data = JSON.parse(message);
+        var index = -1;
+        for(var i=0; i<chatList.length; i++){
+          index = -1;
+          nbUnreadMessage = 0;
+          var chatAsJSON = this.asyncDataToJSON(chatList[i]);
+          if(chatAsJSON.usrToken == data.UsrToken){
+            index = i;
+            nbUnreadMessage = (typeof(chatAsJSON.nbUnreadMessage) != "undefined") ? chatAsJSON.nbUnreadMessage : 0;
+            break;
+          }
+        }
+        if(index > -1){
+          chatList.splice(index, 1);
+        }
+
+        var chat = {};
+        chat.givenName = data.UsrName;
+        chat.usrToken = data.UsrToken;
+        chat.lastMessage = data.message;
+        chat.lastDate = data.date;
+        chat.channel = data.channel;
+        //console.log("Do we need to add +1 to badge?" + JSON.stringify(chatAsJSON));
+        if(nbUnreadMessage == 0){
+          //console.log("yes!");
+          this.addOneToBadge();
+        }
+        chat.nbUnreadMessage = nbUnreadMessage+1;
+        var chatAsString = JSON.stringify(chat);
+        chatAsString = chatAsString.replace(/,/g , "|");
+        chatAsString = chatAsString.replace(/"/g , "\\\"");
+        chatList.unshift(chatAsString);
+      }
+      return chatList;
+    })
+    .then((chatList) => {
+      AsyncStorage.setItem("chatList", chatList.toString())
+      .then(
+          this.fetchData()
+      ).done();
+    })
+    .done();
+  }
+
+  saveMessage(messages){
+    //Save the messages
+    var channels = [];
+    for(var i=0; i<messages.length; i++){
+      var message = messages[i].replace(/\\"/g , "\"");
+      var data = JSON.parse(message);
+      if(channels.indexOf(data.channel) === -1){
+        channels.push(data.channel);
+        let currentChannel = data.channel;
+        AsyncStorage.getItem(currentChannel)
+        .then((rebs) => {
+          var rebsArray = [];
+          if(rebs !== null){
+            rebsArray = rebs.split(",");
+          }
+          for(var j=0; j<messages.length; j++){
+            let currentMessage = messages[j].replace(/\\"/g , "\"");
+            let currentData = JSON.parse(currentMessage);
+            if(currentData.channel == currentChannel){
+              let reb = {};
+              reb.text = currentData.text;
+              reb.rebus = currentData.message;
+              reb.date = currentData.date;
+              reb.language = currentData.language;
+              reb.in = true;
+              let rebAsString = JSON.stringify(reb);
+              rebAsString = rebAsString.replace(/,/g , "|");
+              rebAsString = rebAsString.replace(/"/g , "\\\"");
+              rebsArray.push(rebAsString);
+            }
+          }
+          return rebsArray;
+        })
+        .then((rebsArray)=>{
+          AsyncStorage.setItem(currentChannel, rebsArray.toString());
+        })
+        .done();
+      }
+    }
   }
 
   fetchData() {
@@ -255,6 +399,7 @@ class ChatList extends Component {
 
   _onRefresh() {
     this.setState({reloading: true});
+    //this.getMessages();
     this.fetchData();
   }
 
@@ -381,7 +526,7 @@ class ChatList extends Component {
       );
     }else{
       return (
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, marginBottom:50}}>
        		<ListView
               refreshControl={
                 <RefreshControl
@@ -393,7 +538,7 @@ class ChatList extends Component {
   						onEndReached={this._onEndReached.bind(this)}
             	style={styles.listView}
             	/>
-            <NotificationHandler addOneToBadge={this.addOneToBadge.bind(this)} refreshChatList={this.refreshChatList.bind(this)}/>
+            <NotificationHandler addOneToBadge={this.addOneToBadge.bind(this)} refreshChatList={this.refreshChatList.bind(this)} getMessages={this.getMessages.bind(this)}/>
           </View>
       );
     }
@@ -434,7 +579,7 @@ class ChatList extends Component {
                 <Image style={styles.image} source={require('../../img/rebbot.png')}/>
                 }
                 {rebChat.usrToken != "rebbot" &&
-                <Icon name="ios-contact" size={60} color="#CCCCCC"/>
+                <Icon name="ios-contact" size={58} color="#CCCCCC"/>
                 }
               </View>
               <View>

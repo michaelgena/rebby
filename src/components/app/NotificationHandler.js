@@ -57,7 +57,7 @@ class NotificationHandler extends Component {
         result = result.replace(/\\"/g , "\"");
         var userInfoAsJSON = JSON.parse(result);
         userToken = userInfoAsJSON.token;
-        this.getMessages();
+        //this.getMessages();
         RCTRealtimeMessaging.RTConnect(
         {
           channel: userToken,
@@ -108,97 +108,9 @@ class NotificationHandler extends Component {
     return result;
   }
 
-  getMessages(){
-    var url = conf.get().getMessage+"?token="+userToken;
-    console.log("url to get messages: "+url);
-
-    fetch(conf.get().getMessage+"?token="+userToken).then((response) => response.json())
-    .then((responseData) => {
-      if(responseData.status == "OK"){
-        if(typeof(responseData.messages) != "undefined"){
-          var messages = responseData.messages;
-          for(var i=0; i<messages.length; i++){
-            var message = messages[i].replace(/\\"/g , "\"");
-            var json = JSON.parse(message);
-            this.saveMessage(json);
-          }
-        }
-      }else{
-        console.log("Unable to get messages: "+JSON.stringify(responseData));
-      }
-    }).done();
-  }
-
-  saveMessage(data){
-    console.log("Received message: " + JSON.stringify(data));
-
-    var chatList = [];
-    var nbUnreadMessage = 0;
-    AsyncStorage.getItem("chatList").then((chats) => {
-      if(chats !== null){
-        var index = -1;
-        chatList = chats.split(",");
-        for(var i=0; i<chatList.length; i++){
-          var chatAsJSON = this.asyncDataToJSON(chatList[i]);
-
-          if(chatAsJSON.usrToken == data.UsrToken){
-            index = i;
-            nbUnreadMessage = (typeof(chatAsJSON.nbUnreadMessage) != "undefined") ? chatAsJSON.nbUnreadMessage : 0;
-            break;
-          }
-        }
-        if(index > -1){
-          chatList.splice(index, 1);
-        }
-      }
-      var chat = {};
-      chat.givenName = data.UsrName;
-      chat.usrToken = data.UsrToken;
-      chat.lastMessage = data.message;
-      chat.lastDate = data.date;
-      chat.channel = data.channel;
-      console.log("Do we need to add +1 to badge?" + JSON.stringify(chatAsJSON));
-      if(nbUnreadMessage == 0){
-        console.log("yes!");
-        this.props.addOneToBadge();
-      }
-      chat.nbUnreadMessage = nbUnreadMessage+1;
-      var chatAsString = JSON.stringify(chat);
-      chatAsString = chatAsString.replace(/,/g , "|");
-      chatAsString = chatAsString.replace(/"/g , "\\\"");
-      chatList.unshift(chatAsString);
-      AsyncStorage.setItem("chatList", chatList.toString());
-      this.props.refreshChatList();
-    }).done();
-
-    //Save the message
-    var reb = {};
-    reb.text = data.text;
-    reb.rebus = data.message;
-    reb.date = data.date;
-    reb.language = data.language;
-    reb.in = true;
-    var rebAsString = JSON.stringify(reb);
-    rebAsString = rebAsString.replace(/,/g , "|");
-    rebAsString = rebAsString.replace(/"/g , "\\\"");
-
-    AsyncStorage.getItem(data.channel)
-    .then((rebs) => {
-      if(rebs !== null){
-        rebs = rebs.split(",");
-        rebs.push(rebAsString);
-        AsyncStorage.setItem(data.channel, rebs.toString());
-      }else{
-        var rebs = [];
-        rebs.push(rebAsString);
-        AsyncStorage.setItem(data.channel, rebs.toString());
-      }
-    }).done();
-  }
-
   _onNotification(data){
     console.log("Received notification: " + JSON.stringify(data));
-    this.getMessages();
+    this.props.getMessages();
   }
 
   _onMessage(messageEvent){

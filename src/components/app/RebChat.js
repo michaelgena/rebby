@@ -88,7 +88,7 @@ class RebChat extends Component {
 
   componentDidMount() {
     this.fetchData();
-    console.log('Displayed Chat component.');
+    //console.log('Displayed Chat component.');
   }
 
   componentDidUpdate(){

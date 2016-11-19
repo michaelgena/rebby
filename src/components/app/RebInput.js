@@ -1,6 +1,6 @@
 'use strict';
 import React, { Component } from 'react';
-import { View, Text, StyleSheet,TextInput,TouchableHighlight, ScrollView, PixelRatio, Animated, Navigator, Dimensions, Platform, AsyncStorage, ToolbarAndroid} from 'react-native';
+import { View, Text, StyleSheet,TextInput,TouchableHighlight, ScrollView, PixelRatio, Animated, Navigator, Dimensions, Platform, AsyncStorage, ToolbarAndroid, NetInfo} from 'react-native';
 import Button from 'react-native-button';
 var ExpandingTextInput = require("./ExpandingTextInput");
 var Clipboard = require('react-native-clipboard');
@@ -71,11 +71,30 @@ class RebInput extends Component {
        buttonLabel:props.buttonLabel != null ? props.buttonLabel : "Done",
        suggest1:{},
        suggest2:{},
-       suggest3:{}
+       suggest3:{},
+       isConnected:false,
+       networkError:false
     };
   }
 
   componentDidMount() {
+    NetInfo.isConnected.fetch().then(isConnected => {
+      this.setState({
+          isConnected: isConnected
+      });
+    console.log('First, is ' + (isConnected ? 'online' : 'offline'));
+    });
+    NetInfo.isConnected.addEventListener(
+      'change',
+      this._handleConnectionInfoChange.bind(this)
+    );
+  }
+
+  _handleConnectionInfoChange(isConnected) {
+    this.setState({
+        isConnected: isConnected
+    });
+    console.log('Then, is ' + (isConnected ? 'online' : 'offline'));
   }
 
   doSendMessage(message){
@@ -88,7 +107,7 @@ class RebInput extends Component {
     json.message = this.props.myUserName+" says:\n"+message.rebus;
 
     payload.sound = "default";
-    payload.badge = "1";
+    payload.badge = "+1";
     payload.UsrToken = this.props.myToken;
     payload.UsrName = this.props.myUserName;
     payload.date = message.date;
@@ -107,6 +126,12 @@ class RebInput extends Component {
     .then((response) => {
       console.log("Response after pushing message...");
       console.log(response);
+    })
+    .catch((error) => {
+      this.setState({
+        networkError: true
+      });
+      console.error(error);
     }).done();
 
     fetch(conf.get().addMessage, {
@@ -119,8 +144,13 @@ class RebInput extends Component {
     .then((response) => {
       console.log("Response after saving message for ["+this.props.destinatorToken+"] into sdb...");
       console.log(response);
+    })
+    .catch((error) => {
+      this.setState({
+        networkError: true
+      });
+      console.error(error);
     }).done();
-
   }
 
   _onMessage(messageEvent){
@@ -129,6 +159,10 @@ class RebInput extends Component {
 
   componentWillUnmount() {
     MessageBarManager.unregisterMessageBar();
+    NetInfo.isConnected.removeEventListener(
+      'change',
+      this._handleConnectionInfoChange
+    );
   }
 
   onKeyboardDidShow(e) {
@@ -314,12 +348,21 @@ class RebInput extends Component {
                   multiline={true}
                   onFocus={this.inputFocused.bind(this)}
                 />
-                <Button
-                  style={styles.sendButton}
-                  onPress={this.buttonClicked.bind(this)}
-                >
-                {this.state.buttonLabel}
-                </Button>
+                {this.state.isConnected &&
+                  <Button
+                    style={styles.sendButton}
+                    onPress={this.buttonClicked.bind(this)}
+                  >
+                  {this.state.buttonLabel}
+                  </Button>
+                }
+                {!this.state.isConnected &&
+                  <Button
+                    style={styles.disabledButton}
+                  >
+                  {this.state.buttonLabel}
+                  </Button>
+                }
               </View>
               <View style={styles.suggestions}>
                 <TouchableHighlight onPress={this.replaceOrAddRebBySuggest1.bind(this)}>
@@ -717,6 +760,13 @@ const styles = StyleSheet.create({
     marginTop: 3,
     marginRight: 5,
     marginLeft: 2,
+  },
+  disabledButton: {
+    alignSelf: 'flex-end',
+    marginTop: 3,
+    marginRight: 5,
+    marginLeft: 2,
+    color: '#f4f4f4'
   },
   rebusAndroid: {
     fontSize: 30,

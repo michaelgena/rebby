@@ -48,6 +48,7 @@ class Contacts extends Component {
       codeIncorrect:false,
       userToken: "",
       nbItems:-1,
+      networkError:false,
       dataSource: new ListView.DataSource({
         rowHasChanged: (row1, row2) => row1 !== row2
       })
@@ -227,6 +228,9 @@ class Contacts extends Component {
         })
         .then((response) => response.json())
         .then((responseData) => {
+          this.setState({
+            networkError: false
+          });
           if(responseData.status == "OK"){
             console.log("size:"+responseData.entries.length);
             var contacts = [];
@@ -252,6 +256,12 @@ class Contacts extends Component {
               reloading: false
             });
           }
+        })
+        .catch((error) => {
+          this.setState({
+            networkError: true
+          });
+          console.error(error);
         }).done();
       }
     })
@@ -268,9 +278,9 @@ class Contacts extends Component {
   }
 
   navRebChat(contact){
-    this.setState({
+    /*this.setState({
       isLoading: true
-    });
+    });*/
     //Retrieve the channel token
     var chatList = [];
 
@@ -302,13 +312,16 @@ class Contacts extends Component {
               })
             }
           }
-          this.setState({
+          /*this.setState({
             isLoading: false
-          });
+          });*/
           return chatAlreadyExist;
         })
         .then((chatAlreadyExist) => {
           if(!chatAlreadyExist){
+            this.setState({
+              isLoading: true
+            });
             var url = conf.get().getChannelToken+"?token1="+contact.UsrToken+"&token2="+userInfoAsJSON.token;
             fetch(url)
             .then((response) => response.json())
@@ -429,6 +442,15 @@ class Contacts extends Component {
     }else{
       if(this.state.hasAccount){
         return (
+          <View style={{flex: 1, marginBottom:50}}>
+          {this.state.networkError &&
+            <View style={{flex:1}}>
+    						 <View style={{alignItems: 'center',justifyContent:'center', width: this.state.width, height: 50,backgroundColor:'#CCCCCC'}}>
+    								<Text style={{color:'#ffffff',fontWeight:'800',}} numberOfLines={1}>No Network, try again later.</Text>
+    						</View>
+    						<View style={styles.separator} />
+    				</View>
+          }
           <ListView
               refreshControl={
                 <RefreshControl
@@ -440,6 +462,7 @@ class Contacts extends Component {
   						onEndReached={this._onEndReached.bind(this)}
             	style={styles.listView}
             	/>
+          </View>
         );
       }else{
         if(this.state.codeSent){
@@ -464,7 +487,7 @@ class Contacts extends Component {
         }else{
           return (
             <View style={styles.container}>
-              <Text style={{marginTop:40, marginLeft:10}}>Please fill in these information first:</Text>
+              <Text style={{marginTop:40, marginLeft:10}}>Please sign up first:</Text>
 
               <Text style={{marginTop:20, marginLeft:10}}>Name</Text>
               <TextInput
