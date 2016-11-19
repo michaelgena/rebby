@@ -620,7 +620,7 @@ class ChatList extends Component {
                     </View>
                   </View>
                 </View>
-						    <View style={{width: this.state.width-80}}>
+						    <View style={{width: this.state.width-50}}>
 									<Text style={ Platform.OS === 'ios' ? styles.rebus : styles.rebusAndroid} numberOfLines={1}>{rebChat.lastMessage}</Text>
 							  </View>
 							  <View style={styles.separator} />

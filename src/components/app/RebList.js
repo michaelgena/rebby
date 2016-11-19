@@ -191,6 +191,7 @@ class RebList extends Component {
       );
     }else{
       return (
+        <View style={{flex: 1, marginBottom:50}}>
      		<ListView
             refreshControl={
               <RefreshControl
@@ -202,6 +203,7 @@ class RebList extends Component {
 						onEndReached={this._onEndReached.bind(this)}
           	style={styles.listView}
           	/>
+          </View>
       );
     }
 	}
