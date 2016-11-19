@@ -107,7 +107,7 @@ class RebInput extends Component {
     json.message = this.props.myUserName+" says:\n"+message.rebus;
 
     payload.sound = "default";
-    payload.badge = "+1";
+    payload.badge = "1";
     payload.UsrToken = this.props.myToken;
     payload.UsrName = this.props.myUserName;
     payload.date = message.date;

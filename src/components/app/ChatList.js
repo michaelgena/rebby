@@ -1,7 +1,7 @@
 //'use strict';
 
 import React, { Component } from 'react';
-import { View, Text, StyleSheet,ListView,TouchableHighlight,ActivityIndicatorIOS, AsyncStorage, Platform, ToolbarAndroid, Dimensions, RefreshControl, Image, ScrollView, Animated, AppState } from 'react-native';
+import { View, Text, StyleSheet,ListView,TouchableHighlight,ActivityIndicatorIOS, AsyncStorage, Platform, ToolbarAndroid, Dimensions, RefreshControl, Image, ScrollView, Animated, AppState, PushNotificationIOS } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import RebChat from './RebChat';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -156,6 +156,7 @@ class ChatList extends Component {
 	   this._hasNextPage = true;
 	   this._isFetching = false;
 		 this._entries = [];
+     this.nbAllUnreadMessage = 0;
 
      this.fetchData();
   }
@@ -192,11 +193,22 @@ class ChatList extends Component {
       }
     }).done();
   }
+
   _handleAppStateChange(currentAppState){
     if(currentAppState == "active"){
       this.getMessages();
     }
   }
+  /*_onRegistered(deviceToken) {
+   AlertIOS.alert(
+     'Registered For Remote Push',
+     `Device Token: ${deviceToken}`,
+     [{
+       text: 'Dismiss',
+       onPress: null,
+     }]
+   );
+  }*/
 
   getMessages(){
     var url = conf.get().getMessage+"?token="+userToken;
@@ -277,7 +289,16 @@ class ChatList extends Component {
       AsyncStorage.setItem("chatList", chatList.toString())
       .then(
           this.fetchData()
-      ).done();
+      ).then(()=>{
+        this.nbAllUnreadMessage = 0;
+        for(var i=0; i<chatList.length; i++){
+          var chatAsJSON = this.asyncDataToJSON(chatList[i]);
+          let nbMsg = (typeof(chatAsJSON.nbUnreadMessage) != "undefined") ? chatAsJSON.nbUnreadMessage : 0;
+          this.nbAllUnreadMessage += nbMsg;
+        }
+        PushNotificationIOS.setApplicationIconBadgeNumber(this.nbAllUnreadMessage);
+      })
+      .done();
     })
     .done();
   }
@@ -443,6 +464,8 @@ class ChatList extends Component {
           if(chatAsJSON.nbUnreadMessage > 0){
             this.props.removeOneToBadge();
           }
+          this.nbAllUnreadMessage -= chatAsJSON.nbUnreadMessage ;
+          PushNotificationIOS.setApplicationIconBadgeNumber(this.nbAllUnreadMessage);
           chatAsJSON.nbUnreadMessage = 0;
           var chatAsString = JSON.stringify(chatAsJSON);
           chatAsString = chatAsString.replace(/,/g , "|");

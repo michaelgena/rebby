@@ -28,6 +28,7 @@
 		36D503CB6E364785AE0894AD /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 63A9B599C8674E038C6E42F7 /* Octicons.ttf */; };
 		5A1CDE691DDB6F720086C900 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A1CDE681DDB6F720086C900 /* Social.framework */; };
 		5AE6BC771DDCAEA5009C11CF /* KDSocialShare.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE6BC761DDCAEA5009C11CF /* KDSocialShare.m */; };
+		5AE6BC7E1DE0545F009C11CF /* libRCTPushNotification.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AE6BC7D1DE053A1009C11CF /* libRCTPushNotification.a */; };
 		5AFC17821D99C2E600DAD03C /* libRCTRealtimeMessaging.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A8D89F01D945E8F00D915C6 /* libRCTRealtimeMessaging.a */; };
 		5AFC17831D99C2E600DAD03C /* libRNClipboard.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A8D89FA1D945E8F00D915C6 /* libRNClipboard.a */; };
 		5AFC17841D99C2E600DAD03C /* libRNShare.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A8D89FF1D945E8F00D915C6 /* libRNShare.a */; };
@@ -140,6 +141,13 @@
 			remoteGlobalIDString = 5DBEB1501B18CEA900B34395;
 			remoteInfo = RNVectorIcons;
 		};
+		5AE6BC7C1DE053A1009C11CF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5AE6BC781DE053A0009C11CF /* RCTPushNotification.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 134814201AA4EA6300B7C361;
+			remoteInfo = RCTPushNotification;
+		};
 		5AFB8BE11D99BE77003813B5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 51CDA6243A814D99B072D6A4 /* ReactNativeSocialShare.xcodeproj */;
@@ -198,6 +206,7 @@
 		5A1CDE681DDB6F720086C900 /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
 		5AE6BC751DDCAEA5009C11CF /* KDSocialShare.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KDSocialShare.h; path = "../node_modules/react-native-social-share/iOS/KDSocialShare.h"; sourceTree = "<group>"; };
 		5AE6BC761DDCAEA5009C11CF /* KDSocialShare.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KDSocialShare.m; path = "../node_modules/react-native-social-share/iOS/KDSocialShare.m"; sourceTree = "<group>"; };
+		5AE6BC781DE053A0009C11CF /* RCTPushNotification.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTPushNotification.xcodeproj; path = "../node_modules/react-native/Libraries/PushNotificationIOS/RCTPushNotification.xcodeproj"; sourceTree = "<group>"; };
 		5AFC17FA1D9C42F700DAD03C /* Rebby.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Rebby.entitlements; path = Rebby/Rebby.entitlements; sourceTree = "<group>"; };
 		5AFC17FB1D9C437600DAD03C /* AppDelegate+RealtimeRCTPushNotifications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "AppDelegate+RealtimeRCTPushNotifications.h"; path = "../node_modules/react-native-realtimemessaging-ios/RCTRealtimeMessaging/AppDelegate+RealtimeRCTPushNotifications.h"; sourceTree = "<group>"; };
 		5AFC17FC1D9C437600DAD03C /* AppDelegate+RealtimeRCTPushNotifications.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "AppDelegate+RealtimeRCTPushNotifications.m"; path = "../node_modules/react-native-realtimemessaging-ios/RCTRealtimeMessaging/AppDelegate+RealtimeRCTPushNotifications.m"; sourceTree = "<group>"; };
@@ -228,6 +237,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AE6BC7E1DE0545F009C11CF /* libRCTPushNotification.a in Frameworks */,
 				5A1CDE691DDB6F720086C900 /* Social.framework in Frameworks */,
 				5AFC17821D99C2E600DAD03C /* libRCTRealtimeMessaging.a in Frameworks */,
 				5AFC17831D99C2E600DAD03C /* libRNClipboard.a in Frameworks */,
@@ -411,6 +421,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		5AE6BC791DE053A0009C11CF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5AE6BC7D1DE053A1009C11CF /* libRCTPushNotification.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		5AFB8BD21D99BE77003813B5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -431,6 +449,7 @@
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				5AE6BC781DE053A0009C11CF /* RCTPushNotification.xcodeproj */,
 				5AE6BC751DDCAEA5009C11CF /* KDSocialShare.h */,
 				5AE6BC761DDCAEA5009C11CF /* KDSocialShare.m */,
 				146833FF1AC3E56700842450 /* React.xcodeproj */,
@@ -589,6 +608,10 @@
 					ProjectRef = 00C302D31ABCB9D200DB3ED1 /* RCTNetwork.xcodeproj */;
 				},
 				{
+					ProductGroup = 5AE6BC791DE053A0009C11CF /* Products */;
+					ProjectRef = 5AE6BC781DE053A0009C11CF /* RCTPushNotification.xcodeproj */;
+				},
+				{
 					ProductGroup = 5A8D89E71D945E8F00D915C6 /* Products */;
 					ProjectRef = FFC9625D04404D68B0E0EF8A /* RCTRealtimeMessaging.xcodeproj */;
 				},
@@ -727,6 +750,13 @@
 			fileType = archive.ar;
 			path = libRNVectorIcons.a;
 			remoteRef = 5A8D8A031D945E8F00D915C6 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		5AE6BC7D1DE053A1009C11CF /* libRCTPushNotification.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRCTPushNotification.a;
+			remoteRef = 5AE6BC7C1DE053A1009C11CF /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		5AFB8BE21D99BE77003813B5 /* ReactNativeSocialShare.app */ = {
@@ -917,6 +947,7 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-social-share/iOS",
 					"$(SRCROOT)/../node_modules/react-native-contacts/ios/RCTContacts",
+					"$(SRCROOT)/../node_modules/react-native/Libraries/PushNotificationIOS/**",
 				);
 				INFOPLIST_FILE = Rebby/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -928,8 +959,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.dailyglancer.Rebby;
 				PRODUCT_NAME = Rebby;
-				PROVISIONING_PROFILE = "bf1f4fa5-f011-48a8-91e1-4046730e4bed";
-				PROVISIONING_PROFILE_SPECIFIER = Adhoc;
+				PROVISIONING_PROFILE = "2cc4f22d-e88c-40cd-8941-fca0cd22806b";
+				PROVISIONING_PROFILE_SPECIFIER = "Rebby Push Distribution";
 			};
 			name = Debug;
 		};
@@ -950,6 +981,7 @@
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
 					"$(SRCROOT)/../node_modules/react-native-social-share/iOS",
 					"$(SRCROOT)/../node_modules/react-native-contacts/ios/RCTContacts",
+					"$(SRCROOT)/../node_modules/react-native/Libraries/PushNotificationIOS/**",
 				);
 				INFOPLIST_FILE = Rebby/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -961,8 +993,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.dailyglancer.Rebby;
 				PRODUCT_NAME = Rebby;
-				PROVISIONING_PROFILE = "bf1f4fa5-f011-48a8-91e1-4046730e4bed";
-				PROVISIONING_PROFILE_SPECIFIER = Adhoc;
+				PROVISIONING_PROFILE = "2cc4f22d-e88c-40cd-8941-fca0cd22806b";
+				PROVISIONING_PROFILE_SPECIFIER = "Rebby Push Distribution";
 			};
 			name = Release;
 		};
