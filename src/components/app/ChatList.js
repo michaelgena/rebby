@@ -7,7 +7,7 @@ import RebChat from './RebChat';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Badge from 'react-native-smart-badge';
 import NotificationHandler from './NotificationHandler';
-var userToken = "";
+//var userToken = "";
 var conf = require("../../data/conf.js");
 var styles = StyleSheet.create({
     container: {
@@ -157,7 +157,7 @@ class ChatList extends Component {
 	   this._isFetching = false;
 		 this._entries = [];
      this.nbAllUnreadMessage = 0;
-
+     this.userToken = "";
      this.fetchData();
   }
 
@@ -188,7 +188,7 @@ class ChatList extends Component {
         result = result.replace(/\|/g , ",");
         result = result.replace(/\\"/g , "\"");
         var userInfoAsJSON = JSON.parse(result);
-        userToken = userInfoAsJSON.token;
+        this.userToken = userInfoAsJSON.token;
         this.getMessages();
       }
     }).done();
@@ -212,23 +212,23 @@ class ChatList extends Component {
 
   getMessages(){
 
-    if(userToken == ""){
+    if(this.userToken == ""){
       AsyncStorage.getItem("userInfo").then((result) => {
         if(result != null){
           result = result.replace(/\|/g , ",");
           result = result.replace(/\\"/g , "\"");
           var userInfoAsJSON = JSON.parse(result);
-          userToken = userInfoAsJSON.token;
+          this.userToken = userInfoAsJSON.token;
           this.getMessages();
         }
       }).done();
       return;
     }
 
-    var url = conf.get().getMessage+"?token="+userToken;
+    var url = conf.get().getMessage+"?token="+this.userToken;
     //console.log("url to get messages: "+url);
 
-    fetch(conf.get().getMessage+"?token="+userToken).then((response) => response.json())
+    fetch(conf.get().getMessage+"?token="+this.userToken).then((response) => response.json())
     .then((responseData) => {
       if(responseData.status == "OK"){
         if(typeof(responseData.messages) != "undefined"){
