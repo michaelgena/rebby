@@ -52,7 +52,7 @@ class RebInput extends Component {
       textInputHeight = 40;
     }
     var STATUS_BAR_HEIGHT = Navigator.NavigationBar.Styles.General.StatusBarHeight;
-    this.viewMaxHeight = 118 + textInputHeight;
+    this.viewMaxHeight = 95 + textInputHeight;
     if (Platform.OS === 'android'){
       this.viewMaxHeight = 55 + textInputHeight;
     }

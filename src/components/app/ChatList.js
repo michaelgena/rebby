@@ -211,6 +211,20 @@ class ChatList extends Component {
   }*/
 
   getMessages(){
+
+    if(userToken == ""){
+      AsyncStorage.getItem("userInfo").then((result) => {
+        if(result != null){
+          result = result.replace(/\|/g , ",");
+          result = result.replace(/\\"/g , "\"");
+          var userInfoAsJSON = JSON.parse(result);
+          userToken = userInfoAsJSON.token;
+          this.getMessages();
+        }
+      }).done();
+      return;
+    }
+
     var url = conf.get().getMessage+"?token="+userToken;
     //console.log("url to get messages: "+url);
 
@@ -262,7 +276,14 @@ class ChatList extends Component {
             break;
           }
         }
+
         if(index > -1){
+          //handle the case when coming from a notification
+          //TODO create an id for each message
+          if(chatAsJSON.lastMessage == data.message && chatAsJSON.lastDate == data.date){
+            //we've already handled it
+            return chatList;
+          }
           chatList.splice(index, 1);
         }
 
@@ -318,6 +339,17 @@ class ChatList extends Component {
           if(rebs !== null){
             rebsArray = rebs.split(",");
           }
+
+          //handle the case when coming from a notification
+          //TODO create an id for each message
+          if(rebsArray.length > 0){
+            let lastReb = this.asyncDataToJSON(rebsArray[rebsArray.length - 1]);
+            if(data.message == lastReb.message && data.date == lastReb.date){
+              //we've already handled it
+              return rebsArray;
+            }
+          }
+
           for(var j=0; j<messages.length; j++){
             let currentMessage = messages[j].replace(/\\"/g , "\"");
             let currentData = JSON.parse(currentMessage);
@@ -395,9 +427,9 @@ class ChatList extends Component {
 
       var rebs = [];
       this.addRebbotMessage(rebs, "Hi! I'm Rebbot. I'm here to help you use Rebby.");
-      this.addRebbotMessage(rebs, "You can create a Reb then share it with your friends");
+      this.addRebbotMessage(rebs, "You can create a Reb and share it with your friends.");
       this.addRebbotMessage(rebs, "Or chat directly with your contacts.");
-      this.addRebbotMessage(rebs, "H🅰ve ⛽-el+n! ♥ ");
+      this.addRebbotMessage(rebs, "H🅰ve ⛽-el+n! ♥");
       AsyncStorage.setItem("rebbot", rebs.toString());
       AsyncStorage.setItem("chatList", chatList.toString());
       this.props.addOneToBadge();
@@ -464,7 +496,7 @@ class ChatList extends Component {
           if(chatAsJSON.nbUnreadMessage > 0){
             this.props.removeOneToBadge();
           }
-          this.nbAllUnreadMessage -= chatAsJSON.nbUnreadMessage ;
+          this.nbAllUnreadMessage -= (typeof(chatAsJSON.nbUnreadMessage) != "undefined") ? chatAsJSON.nbUnreadMessage : 0;
           PushNotificationIOS.setApplicationIconBadgeNumber(this.nbAllUnreadMessage);
           chatAsJSON.nbUnreadMessage = 0;
           var chatAsString = JSON.stringify(chatAsJSON);

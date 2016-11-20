@@ -338,7 +338,7 @@ exports.get = function() {
 			{'name':'m', 'value':'\u{24C2}'},
 			{'name':'magnify', 'value':'\u{1F50D}'},
 			{'name':'maize', 'value':'\u{1F33D}'},
-			{'name':'mammal', 'value':'\u{1F40B}'},
+			/*{'name':'mammal', 'value':'\u{1F40B}'},*/
 			{'name':'man', 'value':'\u{1F468}'},
 			{'name':'marquee', 'value':'\u{1F3AA}'},
 			{'name':'mask', 'value':'\u{1F3AD}'},

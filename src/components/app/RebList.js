@@ -143,7 +143,7 @@ class RebList extends Component {
      		isLoading: true,
         reloading: false,
         nbItems: 0,
-        isOnBoarding: true,
+        /*isOnBoarding: true,*/
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height-20,
         dataSource: new ListView.DataSource({
@@ -250,12 +250,12 @@ class RebList extends Component {
   }
 
   componentDidMount() {
-    AsyncStorage.getItem("isOnBoarding").then((value) => {
+    /*AsyncStorage.getItem("isOnBoarding").then((value) => {
       console.log("AsyncStorage:"+value);
       if(value !== null && value === "false"){
         this.state.isOnBoarding = false;
       }
-    }).done();
+    }).done();*/
     this.fetchData();
   }
 
@@ -282,7 +282,8 @@ class RebList extends Component {
           reloading: false
         });
       }
-    }).done();
+    })
+    .done();
   }
 
   _onRefresh() {
@@ -290,11 +291,11 @@ class RebList extends Component {
     this.fetchData();
   }
 
-  doneOnBoarding() {
+  /*doneOnBoarding() {
     this.setState({isOnBoarding: false});
     AsyncStorage.setItem("isOnBoarding", "false");
     this.fetchData();
-  }
+  }*/
 
 	async _fetchCurrentPage() {
     if (this._isFetching || !this._hasNextPage) {
