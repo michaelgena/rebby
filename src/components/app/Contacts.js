@@ -291,6 +291,7 @@ class Contacts extends Component {
         var userInfoAsJSON = JSON.parse(result);
         var channel = "";
         var chatAlreadyExist = false;
+        var token = "";
         AsyncStorage.getItem("chatList")
         .then((chats) => {
           if(chats !== null){
@@ -300,6 +301,7 @@ class Contacts extends Component {
               if(ChatAsJSON.usrToken == contact.UsrToken){
                 chatAlreadyExist = true;
                 channel = ChatAsJSON.channel;
+                token = ChatAsJSON.usrToken;
                 break;
               }
             }
@@ -308,7 +310,7 @@ class Contacts extends Component {
                 id: 'rebChat',
                 title: contact.UsrName,
                 component: RebChat,
-                passProps: {givenName:contact.UsrName, channel:channel},
+                passProps: {givenName:contact.UsrName, channel:channel, token:token},
               })
             }
           }
@@ -348,7 +350,7 @@ class Contacts extends Component {
                     id: 'rebChat',
                     title: contact.UsrName,
                     component: RebChat,
-                    passProps: {givenName:contact.UsrName, channel:responseData.token},
+                    passProps: {givenName:contact.UsrName, channel:responseData.token, token:chat.usrToken},
                 })
               }
 
