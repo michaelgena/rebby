@@ -54,7 +54,7 @@ class Reb extends Component {
   tweet() {
     KDSocialShare.tweet({
         'text':this.state.rebus,
-        'link':'',
+        'link':'http://rebbyapp.com',
         'imagelink':'',
       },
       (results) => {
@@ -67,8 +67,8 @@ class Reb extends Component {
 
     KDSocialShare.shareOnFacebook({
         'text':this.state.rebus,
-        'link':'',
-        'imagelink':'https://lh3.googleusercontent.com/Dffl5I2uYfuNhNeT2pMkHzJWjn99lz1uox4dEjRtwXA9OO5sO81h-oO8jmSkOFFFj3vwb7r7Z_qpIsoC3EKtTKc1M1MR',
+        'link':'http://rebbyapp.com',
+        'imagelink':'',
       },
       (results) => {
         console.log(results);

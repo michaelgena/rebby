@@ -4,6 +4,10 @@ import { View, Text, StyleSheet,TextInput,TouchableHighlight, ScrollView, PixelR
 import RebInput from './RebInput';
 import realtimeIOS from '../../../RCTRealtimeMessagingIOS';
 import realtimeAndroid from '../../../RCTRealtimeMessagingAndroid';
+import Icon from 'react-native-vector-icons/Ionicons';
+var KDSocialShare = require('NativeModules').KDSocialShare;
+var Clipboard = require('react-native-clipboard');
+
 var RCTRealtimeMessaging;
 if (Platform.OS === 'ios'){
   RCTRealtimeMessaging = new realtimeIOS();
@@ -231,6 +235,34 @@ class RebChat extends Component {
       }).start();
   }
 
+  tweet(reb) {
+    KDSocialShare.tweet({
+        'text':reb,
+        'link':'http://rebbyapp.com',
+        'imagelink':'',
+      },
+      (results) => {
+        console.log(results);
+      }
+    );
+  }
+
+  shareOnFacebook(reb) {
+    KDSocialShare.shareOnFacebook({
+        'text':reb,
+        'link':'http://rebbyapp.com',
+        'imagelink':'',
+      },
+      (results) => {
+        console.log(results);
+      }
+    );
+  }
+
+  copyToClipboard(reb){
+    Clipboard.set(reb);
+  }
+
   renderMessage(message) {
     if(this.state.nbItems == 0){
       console.log("Empty");
@@ -247,11 +279,37 @@ class RebChat extends Component {
 
     var msg = JSON.parse(message);
     if(msg.in !== null && msg.in == true){
+      var reb = msg.rebus.replace(/ /g, "\u2000");
       return (
         <View>
           <View style={{flex:1, flexDirection: 'row',justifyContent:'flex-start'}}>
             <View style={{flex:1, flexDirection: 'column',}}>
               <Text style={Platform.OS === 'android'? styles.leftRebusAndroid : styles.leftRebus}>{msg.rebus.replace(/ /g, "\u2000")}</Text>
+
+              {typeof(msg.share) != "undefined"  &&
+              <View style={{marginLeft: 20, marginRight: 5}}>
+                <ScrollView>
+                  <View >
+                      <TouchableHighlight onPress={()=> this.tweet(reb)}>
+                        <View style={{flex:1, flexDirection: 'row', alignItems: 'center',justifyContent:'center', height: 50,backgroundColor:'#00aced'}}>
+                         <Text style={{color:'#ffffff',fontWeight:'800'}}>Share </Text><Icon name="logo-twitter" size={25} color="#FFFFFF" />
+                        </View>
+                      </TouchableHighlight>
+                      <TouchableHighlight onPress={()=> this.shareOnFacebook(reb)}>
+                        <View style={{flex:1, flexDirection: 'row', alignItems: 'center',justifyContent:'center', height: 50,backgroundColor:'#3b5998'}}>
+                         <Text style={{color:'#ffffff',fontWeight:'800',}}>Share </Text><Icon name="logo-facebook" size={25} color="#FFFFFF" />
+                        </View>
+                      </TouchableHighlight>
+                      <TouchableHighlight onPress={()=> this.copyToClipboard(reb)}>
+                        <View style={{flex:1, flexDirection: 'row', alignItems: 'center',justifyContent:'center', height: 50,backgroundColor:'#f4f4f4'}}>
+                          <Text style={{color:'#ffffff',fontWeight:'800',}}>Copy </Text><Icon name="ios-clipboard" size={25} color="#FFFFFF"/>
+                        </View>
+                      </TouchableHighlight>
+                  </View>
+                </ScrollView>
+              </View>
+              }
+
               <View style={styles.triangleLeftCorner} />
             </View>
             <View style={{width:60}}/>
@@ -484,6 +542,11 @@ const styles = StyleSheet.create({
      backgroundColor: '#FFFFFF',
      height: 56,
      alignItems: 'center'
+   },
+   shareContainer: {
+     flex:1,
+     alignSelf: 'stretch',
+     flexDirection: 'row',
    },
 })
 

@@ -360,6 +360,11 @@ class ChatList extends Component {
               reb.date = currentData.date;
               reb.language = currentData.language;
               reb.in = true;
+
+              if(typeof(currentData.share) != "undefined"){
+                reb.share = true;
+              }
+
               let rebAsString = JSON.stringify(reb);
               rebAsString = rebAsString.replace(/,/g , "|");
               rebAsString = rebAsString.replace(/"/g , "\\\"");
