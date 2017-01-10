@@ -173,6 +173,7 @@ class RebInput extends Component {
         }).start();
     }
     if (Platform.OS === 'android'){
+      console.log("viewMaxHeight from RebInput:"+ this.viewMaxHeight);
       Animated.timing(this.state.height, {
           toValue: e.endCoordinates.height,
           duration: 200,
@@ -263,52 +264,6 @@ class RebInput extends Component {
   }
 
   render() {
-    if(Platform.OS === 'android'){
-      return (
-        <Animated.View
-          style={{
-            height: this.state.height,
-            justifyContent: 'flex-start'
-          }}
-        >
-        <View style={styles.container}>
-              <View style={{flex:1, flexDirection: 'row',}}>
-                <View style={{width:60}}/>
-                <View style={{flex:1, flexDirection: 'column',}}>
-                  <Text style={styles.rebusAndroid}>{this.state.rebus}</Text>
-                  <View style={styles.triangleCorner} />
-                </View>
-              </View>
-            <View style={styles.textPlaceContainer}>
-              <View style={styles.textInputContainer}>
-                <Button
-                  style={styles.sendButton}
-                  onPress={this.switchLanguage.bind(this)}
-                >
-                {this.state.language}
-                </Button>
-                <ExpandingTextInput
-                  value={this.state.text}
-                  onChangeText={(text) => {this.setState({text});this.generate(this.state.text)}}
-                  controlled={true}
-                  placeholder="Your text here..."
-                  autoCorrect={true}
-                  multiline={true}
-                  onFocus={this.inputFocused.bind(this)}
-                />
-                <Button
-                  style={styles.sendButton}
-                  onPress={this.buttonClicked.bind(this)}
-                >
-                {this.state.buttonLabel}
-                </Button>
-              </View>
-            </View>
-          </View>
-        </Animated.View>
-      );
-
-    }else{
       return (
         <Animated.View
           style={{
@@ -325,7 +280,7 @@ class RebInput extends Component {
             <View style={{flex:1, flexDirection: 'row'}}>
               <View style={{width:60}}/>
               <View style={{flex:1, flexDirection: 'column'}}>
-                <Text style={styles.rebusWriting}>{this.state.rebus}</Text>
+                <Text style={Platform.OS === 'android'? styles.rebusAndroid : styles.rebusWriting}>{this.state.rebus}</Text>
                 <View style={styles.triangleCornerWriting} />
               </View>
             </View>
@@ -367,17 +322,17 @@ class RebInput extends Component {
               <View style={styles.suggestions}>
                 <TouchableHighlight onPress={this.replaceOrAddRebBySuggest1.bind(this)}>
                   <View style={{flex:1, alignItems: 'center',justifyContent:'center', width: this.viewMaxWidth/3, height: 30,backgroundColor:'#FFFFFF',margin: 1}}>
-                    <Text numberOfLines={1}>{this.state.suggest1.display}</Text>
+                    <Text numberOfLines={1} style={Platform.OS === 'android'? styles.androidFont : ""}>{this.state.suggest1.display}</Text>
                   </View>
                 </TouchableHighlight>
                 <TouchableHighlight onPress={this.replaceOrAddRebBySuggest2.bind(this)}>
                   <View style={{flex:1, alignItems: 'center',justifyContent:'center', width: this.viewMaxWidth/3, height: 30,backgroundColor:'#FFFFFF',margin: 1}}>
-                    <Text numberOfLines={1}>{this.state.suggest2.display}</Text>
+                    <Text numberOfLines={1} style={Platform.OS === 'android'? styles.androidFont : ""}>{this.state.suggest2.display}</Text>
                   </View>
                 </TouchableHighlight>
                 <TouchableHighlight onPress={this.replaceOrAddRebBySuggest3.bind(this)}>
                   <View style={{flex:1, alignItems: 'center',justifyContent:'center', width: this.viewMaxWidth/3, height: 30,backgroundColor:'#FFFFFF',margin: 1}}>
-                    <Text numberOfLines={1}>{this.state.suggest3.display}</Text>
+                    <Text numberOfLines={1} style={Platform.OS === 'android'? styles.androidFont : ""}>{this.state.suggest3.display}</Text>
                   </View>
                 </TouchableHighlight>
               </View>
@@ -385,7 +340,6 @@ class RebInput extends Component {
           </View>
         </Animated.View>
       );
-    }
   }
 
   generate(text) {
@@ -784,7 +738,7 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     marginLeft: 5,
     justifyContent: 'center',
-    backgroundColor: '#FDF058',
+    backgroundColor: '#fffac6',
   },
   rebus: {
     fontSize: 30,
@@ -853,6 +807,9 @@ const styles = StyleSheet.create({
       {rotate: '90deg'}
     ]
   },
+  androidFont:{
+    fontFamily: 'emojione_android',
+  }
 })
 
 export default RebInput;

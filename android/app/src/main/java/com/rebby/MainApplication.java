@@ -12,6 +12,7 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import co.realtime.reactnativemessagingandroid.RealtimeMessagingPackage;
+import com.davidsandor.rnclipboardandroid.RNClipboardAndroidPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +32,8 @@ public class MainApplication extends Application implements ReactApplication {
             new ReactNativeContacts(),
             new VectorIconsPackage(),
             new RNSharePackage(),
-            new RealtimeMessagingPackage()
+            new RealtimeMessagingPackage(),
+            new RNClipboardAndroidPackage()
       );
     }
   };

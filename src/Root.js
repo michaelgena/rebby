@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import RealtimeRCT from './components/app/RealtimeRCT';
 import RealtimeRCTAndroid from './components/app/RealtimeRCTAndroid';
 import ChatList from './components/app/ChatList';
+import RebChat from './components/app/RebChat';
 import Contacts from './components/app/Contacts';
 import Settings from './components/app/Settings';
 
@@ -219,7 +220,9 @@ class Root extends Component{
       case 'settings':
           return (<Settings navigator={navigator} title="Settings" {...route.passProps}/>);
       case 'chatList':
-          return (<ChatList navigator={navigator} title="Chats" {...route.passProps}/>);
+          return (<ChatList navigator={navigator} title="Rebby" {...route.passProps}/>);
+      case 'rebChat':
+          return (<RebChat navigator={navigator} title="Chat" {...route.passProps}/>);
       case 'contacts':
           return (<Contacts navigator={navigator} title="Contacts" {...route.passProps}/>);
     }

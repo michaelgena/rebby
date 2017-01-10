@@ -14,7 +14,7 @@ var styles = StyleSheet.create({
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: '#F9F9F9',
-      paddingTop: Platform.OS === 'android' ? 0 : 30,
+      paddingTop: Platform.OS === 'android' ? 2 : 30,
     },
     title: {
         fontSize: 20,
@@ -46,7 +46,7 @@ var styles = StyleSheet.create({
        justifyContent: 'center'
    },
    toolbar: {
-     backgroundColor: '#FFFFFF',
+     backgroundColor: '#FDF058',
      height: 56,
      alignItems: 'center'
    },
@@ -128,11 +128,8 @@ var styles = StyleSheet.create({
 });
 
 var toolbarActions = [
-  {title: 'New', show: 'always'},
-  { title: 'Contacts', iconName: 'md-contact', iconSize: 30, show: 'always' },
-  { title: 'Chats', iconName: 'md-chatbubbles', iconSize: 30, show: 'always' },
-  { title: 'Settings', iconName: 'md-settings', iconSize: 30, show: 'always' },
-];
+  {title: 'New', show: 'always'}
+  ];
 
 class RebList extends Component {
 
@@ -169,8 +166,10 @@ class RebList extends Component {
 
           <View style={{flex: 1}}>
             <Icon.ToolbarAndroid style={styles.toolbar}
-                    title="Home"
+                    title="Rebs"
                     titleColor={'black'}
+                    navIcon={require('./ic_arrow_back_white_24dp.png')}
+                    onIconClicked={this.props.navigator.pop}
                     actions={toolbarActions}
                     onActionSelected={this._onActionSelected.bind(this)}/>
           <View style={styles.container}>

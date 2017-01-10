@@ -26,7 +26,7 @@ e.length=0},goog.array.insert=function(e,t){goog.array.contains(e,t)||e.push(t)}
 while(!this.isValidNumber(t));return e.setNationalNumber(n),!0},i18n.phonenumbers.PhoneNumberUtil.prototype.extractCountryCode=function(e,t){var n=e.toString();if(0==n.length||"0"==n.charAt(0))return 0;for(var o,r=n.length,d=1;d<=i18n.phonenumbers.PhoneNumberUtil.MAX_LENGTH_COUNTRY_CODE_&&r>=d;++d)if(o=parseInt(n.substring(0,d),10),o in i18n.phonenumbers.metadata.countryCodeToRegionCodeMap)return t.append(n.substring(d)),o;return 0},i18n.phonenumbers.PhoneNumberUtil.prototype.maybeExtractCountryCode=function(e,t,n,o,r){if(0==e.length)return 0;e=new goog.string.StringBuffer(e);var d;if(null!=t&&(d=t.getInternationalPrefix()),null==d&&(d="NonMatch"),d=this.maybeStripInternationalPrefixAndNormalize(e,d),o&&r.setCountryCodeSource(d),d!=i18n.phonenumbers.PhoneNumber.CountryCodeSource.FROM_DEFAULT_COUNTRY){if(e.getLength()<=i18n.phonenumbers.PhoneNumberUtil.MIN_LENGTH_FOR_NSN_)throw i18n.phonenumbers.Error.TOO_SHORT_AFTER_IDD;if(n=this.extractCountryCode(e,n),0!=n)return r.setCountryCode(n),n;throw i18n.phonenumbers.Error.INVALID_COUNTRY_CODE}if(null!=t){d=t.getCountryCodeOrDefault();var i=""+d,N=e.toString();if(goog.string.startsWith(N,i)){var a=new goog.string.StringBuffer(N.substring(i.length)),N=t.getGeneralDesc(),i=new RegExp(N.getNationalNumberPatternOrDefault());if(this.maybeStripNationalPrefixAndCarrierCode(a,t,null),t=a.toString(),N=N.getPossibleNumberPatternOrDefault(),!i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(i,e.toString())&&i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(i,t)||this.testNumberLengthAgainstPattern_(N,e.toString())==i18n.phonenumbers.PhoneNumberUtil.ValidationResult.TOO_LONG)return n.append(t),o&&r.setCountryCodeSource(i18n.phonenumbers.PhoneNumber.CountryCodeSource.FROM_NUMBER_WITHOUT_PLUS_SIGN),r.setCountryCode(d),d}}return r.setCountryCode(0),0},i18n.phonenumbers.PhoneNumberUtil.prototype.parsePrefixAsIdd_=function(e,t){var n=t.toString();if(0==n.search(e)){var o=n.match(e)[0].length,r=n.substring(o).match(i18n.phonenumbers.PhoneNumberUtil.CAPTURING_DIGIT_PATTERN);return r&&null!=r[1]&&0<r[1].length&&"0"==i18n.phonenumbers.PhoneNumberUtil.normalizeDigitsOnly(r[1])?!1:(t.clear(),t.append(n.substring(o)),!0)}return!1},i18n.phonenumbers.PhoneNumberUtil.prototype.maybeStripInternationalPrefixAndNormalize=function(e,t){var n=e.toString();return 0==n.length?i18n.phonenumbers.PhoneNumber.CountryCodeSource.FROM_DEFAULT_COUNTRY:i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN_.test(n)?(n=n.replace(i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN_,""),e.clear(),e.append(i18n.phonenumbers.PhoneNumberUtil.normalize(n)),i18n.phonenumbers.PhoneNumber.CountryCodeSource.FROM_NUMBER_WITH_PLUS_SIGN):(n=new RegExp(t),i18n.phonenumbers.PhoneNumberUtil.normalizeSB_(e),this.parsePrefixAsIdd_(n,e)?i18n.phonenumbers.PhoneNumber.CountryCodeSource.FROM_NUMBER_WITH_IDD:i18n.phonenumbers.PhoneNumber.CountryCodeSource.FROM_DEFAULT_COUNTRY)},i18n.phonenumbers.PhoneNumberUtil.prototype.maybeStripNationalPrefixAndCarrierCode=function(e,t,n){var o=e.toString(),r=o.length,d=t.getNationalPrefixForParsing();if(0==r||null==d||0==d.length)return!1;var i=new RegExp("^(?:"+d+")");if(r=i.exec(o)){var d=new RegExp(t.getGeneralDesc().getNationalNumberPatternOrDefault()),N=i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(d,o),a=r.length-1;if(t=t.getNationalPrefixTransformRule(),null==t||0==t.length||null==r[a]||0==r[a].length){if(N&&!i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(d,o.substring(r[0].length)))return!1;null!=n&&a>0&&null!=r[a]&&n.append(r[1]),e.set(o.substring(r[0].length))}else{if(o=o.replace(i,t),N&&!i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_(d,o))return!1;null!=n&&a>0&&n.append(r[1]),e.set(o)}return!0}return!1},i18n.phonenumbers.PhoneNumberUtil.prototype.maybeStripExtension=function(e){var t=e.toString(),n=t.search(i18n.phonenumbers.PhoneNumberUtil.EXTN_PATTERN_);if(n>=0&&i18n.phonenumbers.PhoneNumberUtil.isViablePhoneNumber(t.substring(0,n)))for(var o=t.match(i18n.phonenumbers.PhoneNumberUtil.EXTN_PATTERN_),r=o.length,d=1;r>d;++d)if(null!=o[d]&&0<o[d].length)return e.clear(),e.append(t.substring(0,n)),o[d];return""},i18n.phonenumbers.PhoneNumberUtil.prototype.checkRegionForParsing_=function(e,t){return this.isValidRegionCode_(t)||null!=e&&0<e.length&&i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN_.test(e)},i18n.phonenumbers.PhoneNumberUtil.prototype.parse=function(e,t){return this.parseHelper_(e,t,!1,!0)},i18n.phonenumbers.PhoneNumberUtil.prototype.parseAndKeepRawInput=function(e,t){if(!this.isValidRegionCode_(t)&&0<e.length&&e.charAt(0)!=i18n.phonenumbers.PhoneNumberUtil.PLUS_SIGN)throw i18n.phonenumbers.Error.INVALID_COUNTRY_CODE;return this.parseHelper_(e,t,!0,!0)},i18n.phonenumbers.PhoneNumberUtil.prototype.setItalianLeadingZerosForPhoneNumber_=function(e,t){if(1<e.length&&"0"==e.charAt(0)){t.setItalianLeadingZero(!0);for(var n=1;n<e.length-1&&"0"==e.charAt(n);)n++;1!=n&&t.setNumberOfLeadingZeros(n)}},i18n.phonenumbers.PhoneNumberUtil.prototype.parseHelper_=function(e,t,n,o){if(null==e)throw i18n.phonenumbers.Error.NOT_A_NUMBER;if(e.length>i18n.phonenumbers.PhoneNumberUtil.MAX_INPUT_STRING_LENGTH_)throw i18n.phonenumbers.Error.TOO_LONG;var r=new goog.string.StringBuffer;if(this.buildNationalNumberForParsing_(e,r),!i18n.phonenumbers.PhoneNumberUtil.isViablePhoneNumber(r.toString()))throw i18n.phonenumbers.Error.NOT_A_NUMBER;if(o&&!this.checkRegionForParsing_(r.toString(),t))throw i18n.phonenumbers.Error.INVALID_COUNTRY_CODE;o=new i18n.phonenumbers.PhoneNumber,n&&o.setRawInput(e),e=this.maybeStripExtension(r),0<e.length&&o.setExtension(e),e=this.getMetadataForRegion(t);var d=new goog.string.StringBuffer,i=0,N=r.toString();try{i=this.maybeExtractCountryCode(N,e,d,n,o)}catch(a){if(a!=i18n.phonenumbers.Error.INVALID_COUNTRY_CODE||!i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN_.test(N))throw a;if(N=N.replace(i18n.phonenumbers.PhoneNumberUtil.LEADING_PLUS_CHARS_PATTERN_,""),i=this.maybeExtractCountryCode(N,e,d,n,o),0==i)throw a}if(0!=i?(r=this.getRegionCodeForCountryCode(i),r!=t&&(e=this.getMetadataForRegionOrCallingCode_(i,r))):(i18n.phonenumbers.PhoneNumberUtil.normalizeSB_(r),d.append(r.toString()),null!=t?(i=e.getCountryCodeOrDefault(),o.setCountryCode(i)):n&&o.clearCountryCodeSource()),d.getLength()<i18n.phonenumbers.PhoneNumberUtil.MIN_LENGTH_FOR_NSN_)throw i18n.phonenumbers.Error.TOO_SHORT_NSN;if(null!=e&&(t=new goog.string.StringBuffer,r=new goog.string.StringBuffer(d.toString()),this.maybeStripNationalPrefixAndCarrierCode(r,e,t),this.isShorterThanPossibleNormalNumber_(e,r.toString())||(d=r,n&&o.setPreferredDomesticCarrierCode(t.toString()))),n=d.toString(),t=n.length,t<i18n.phonenumbers.PhoneNumberUtil.MIN_LENGTH_FOR_NSN_)throw i18n.phonenumbers.Error.TOO_SHORT_NSN;if(t>i18n.phonenumbers.PhoneNumberUtil.MAX_LENGTH_FOR_NSN_)throw i18n.phonenumbers.Error.TOO_LONG;return this.setItalianLeadingZerosForPhoneNumber_(n,o),o.setNationalNumber(parseInt(n,10)),o},i18n.phonenumbers.PhoneNumberUtil.prototype.buildNationalNumberForParsing_=function(e,t){var n=e.indexOf(i18n.phonenumbers.PhoneNumberUtil.RFC3966_PHONE_CONTEXT_);if(n>0){var o=n+i18n.phonenumbers.PhoneNumberUtil.RFC3966_PHONE_CONTEXT_.length;if(e.charAt(o)==i18n.phonenumbers.PhoneNumberUtil.PLUS_SIGN){var r=e.indexOf(";",o);t.append(r>0?e.substring(o,r):e.substring(o))}o=e.indexOf(i18n.phonenumbers.PhoneNumberUtil.RFC3966_PREFIX_),t.append(e.substring(o>=0?o+i18n.phonenumbers.PhoneNumberUtil.RFC3966_PREFIX_.length:0,n))}else t.append(i18n.phonenumbers.PhoneNumberUtil.extractPossibleNumber(e));n=t.toString(),o=n.indexOf(i18n.phonenumbers.PhoneNumberUtil.RFC3966_ISDN_SUBADDRESS_),o>0&&(t.clear(),t.append(n.substring(0,o)))},i18n.phonenumbers.PhoneNumberUtil.prototype.isNumberMatch=function(e,t){var n,o;if("string"==typeof e)try{n=this.parse(e,i18n.phonenumbers.PhoneNumberUtil.UNKNOWN_REGION_)}catch(r){if(r!=i18n.phonenumbers.Error.INVALID_COUNTRY_CODE)return i18n.phonenumbers.PhoneNumberUtil.MatchType.NOT_A_NUMBER;if("string"!=typeof t){var d=this.getRegionCodeForCountryCode(t.getCountryCodeOrDefault());if(d!=i18n.phonenumbers.PhoneNumberUtil.UNKNOWN_REGION_){try{n=this.parse(e,d)}catch(i){return i18n.phonenumbers.PhoneNumberUtil.MatchType.NOT_A_NUMBER}return n=this.isNumberMatch(n,t),n==i18n.phonenumbers.PhoneNumberUtil.MatchType.EXACT_MATCH?i18n.phonenumbers.PhoneNumberUtil.MatchType.NSN_MATCH:n}}try{n=this.parseHelper_(e,null,!1,!1)}catch(N){return i18n.phonenumbers.PhoneNumberUtil.MatchType.NOT_A_NUMBER}}else n=e.clone();if("string"==typeof t)try{return o=this.parse(t,i18n.phonenumbers.PhoneNumberUtil.UNKNOWN_REGION_),this.isNumberMatch(e,o)}catch(a){return a!=i18n.phonenumbers.Error.INVALID_COUNTRY_CODE?i18n.phonenumbers.PhoneNumberUtil.MatchType.NOT_A_NUMBER:this.isNumberMatch(t,n)}else o=t.clone();if(n.clearRawInput(),n.clearCountryCodeSource(),n.clearPreferredDomesticCarrierCode(),o.clearRawInput(),o.clearCountryCodeSource(),o.clearPreferredDomesticCarrierCode(),n.hasExtension()&&0==n.getExtension().length&&n.clearExtension(),o.hasExtension()&&0==o.getExtension().length&&o.clearExtension(),n.hasExtension()&&o.hasExtension()&&n.getExtension()!=o.getExtension())return i18n.phonenumbers.PhoneNumberUtil.MatchType.NO_MATCH;var d=n.getCountryCodeOrDefault(),u=o.getCountryCodeOrDefault();return 0!=d&&0!=u?n.equals(o)?i18n.phonenumbers.PhoneNumberUtil.MatchType.EXACT_MATCH:d==u&&this.isNationalNumberSuffixOfTheOther_(n,o)?i18n.phonenumbers.PhoneNumberUtil.MatchType.SHORT_NSN_MATCH:i18n.phonenumbers.PhoneNumberUtil.MatchType.NO_MATCH:(n.setCountryCode(0),o.setCountryCode(0),n.equals(o)?i18n.phonenumbers.PhoneNumberUtil.MatchType.NSN_MATCH:this.isNationalNumberSuffixOfTheOther_(n,o)?i18n.phonenumbers.PhoneNumberUtil.MatchType.SHORT_NSN_MATCH:i18n.phonenumbers.PhoneNumberUtil.MatchType.NO_MATCH)},i18n.phonenumbers.PhoneNumberUtil.prototype.isNationalNumberSuffixOfTheOther_=function(e,t){var n=""+e.getNationalNumber(),o=""+t.getNationalNumber();return goog.string.endsWith(n,o)||goog.string.endsWith(o,n)},i18n.phonenumbers.PhoneNumberUtil.prototype.canBeInternationallyDialled=function(e){var t=this.getMetadataForRegion(this.getRegionCodeForNumber(e));return null==t?!0:(e=this.getNationalSignificantNumber(e),!this.isNumberMatchingDesc_(e,t.getNoInternationalDialling()))},i18n.phonenumbers.PhoneNumberUtil.matchesEntirely_=function(e,t){var n=t.match("string"==typeof e?"^(?:"+e+")$":e);return n&&n[0].length==t.length?!0:!1},i18n.phonenumbers.AsYouTypeFormatter=function(e){this.DIGIT_PLACEHOLDER_=" ",this.DIGIT_PATTERN_=new RegExp(this.DIGIT_PLACEHOLDER_),this.currentOutput_="",this.formattingTemplate_=new goog.string.StringBuffer,this.currentFormattingPattern_="",this.accruedInput_=new goog.string.StringBuffer,this.accruedInputWithoutFormatting_=new goog.string.StringBuffer,this.ableToFormat_=!0,this.isExpectingCountryCallingCode_=this.isCompleteNumber_=this.inputHasFormatting_=!1,this.phoneUtil_=i18n.phonenumbers.PhoneNumberUtil.getInstance(),this.positionToRemember_=this.originalPosition_=this.lastMatchPosition_=0,this.prefixBeforeNationalNumber_=new goog.string.StringBuffer,this.shouldAddSpaceAfterNationalPrefix_=!1,this.extractedNationalPrefix_="",this.nationalNumber_=new goog.string.StringBuffer,this.possibleFormats_=[],this.defaultCountry_=e,this.defaultMetadata_=this.currentMetadata_=this.getMetadataForRegion_(this.defaultCountry_)},i18n.phonenumbers.AsYouTypeFormatter.SEPARATOR_BEFORE_NATIONAL_NUMBER_=" ",i18n.phonenumbers.AsYouTypeFormatter.EMPTY_METADATA_=new i18n.phonenumbers.PhoneMetadata,i18n.phonenumbers.AsYouTypeFormatter.EMPTY_METADATA_.setInternationalPrefix("NA"),i18n.phonenumbers.AsYouTypeFormatter.CHARACTER_CLASS_PATTERN_=/\[([^\[\]])*\]/g,i18n.phonenumbers.AsYouTypeFormatter.STANDALONE_DIGIT_PATTERN_=/\d(?=[^,}][^,}])/g,i18n.phonenumbers.AsYouTypeFormatter.ELIGIBLE_FORMAT_PATTERN_=new RegExp("^["+i18n.phonenumbers.PhoneNumberUtil.VALID_PUNCTUATION+"]*(\\$\\d["+i18n.phonenumbers.PhoneNumberUtil.VALID_PUNCTUATION+"]*)+$"),i18n.phonenumbers.AsYouTypeFormatter.NATIONAL_PREFIX_SEPARATORS_PATTERN_=/[- ]/,i18n.phonenumbers.AsYouTypeFormatter.MIN_LEADING_DIGITS_LENGTH_=3,i18n.phonenumbers.AsYouTypeFormatter.prototype.getMetadataForRegion_=function(e){return e=this.phoneUtil_.getCountryCodeForRegion(e),e=this.phoneUtil_.getRegionCodeForCountryCode(e),e=this.phoneUtil_.getMetadataForRegion(e),null!=e?e:i18n.phonenumbers.AsYouTypeFormatter.EMPTY_METADATA_},i18n.phonenumbers.AsYouTypeFormatter.prototype.maybeCreateNewTemplate_=function(){for(var e=this.possibleFormats_.length,t=0;e>t;++t){var n=this.possibleFormats_[t],o=n.getPatternOrDefault();if(this.currentFormattingPattern_==o)return!1;if(this.createFormattingTemplate_(n))return this.currentFormattingPattern_=o,this.shouldAddSpaceAfterNationalPrefix_=i18n.phonenumbers.AsYouTypeFormatter.NATIONAL_PREFIX_SEPARATORS_PATTERN_.test(n.getNationalPrefixFormattingRule()),this.lastMatchPosition_=0,!0}return this.ableToFormat_=!1},i18n.phonenumbers.AsYouTypeFormatter.prototype.getAvailableFormats_=function(e){for(var t=this.isCompleteNumber_&&0<this.currentMetadata_.intlNumberFormatCount()?this.currentMetadata_.intlNumberFormatArray():this.currentMetadata_.numberFormatArray(),n=t.length,o=0;n>o;++o){var r=t[o];(!this.currentMetadata_.hasNationalPrefix()||this.isCompleteNumber_||r.getNationalPrefixOptionalWhenFormatting()||this.phoneUtil_.formattingRuleHasFirstGroupOnly(r.getNationalPrefixFormattingRuleOrDefault()))&&this.isFormatEligible_(r.getFormatOrDefault())&&this.possibleFormats_.push(r)}this.narrowDownPossibleFormats_(e)},i18n.phonenumbers.AsYouTypeFormatter.prototype.isFormatEligible_=function(e){return i18n.phonenumbers.AsYouTypeFormatter.ELIGIBLE_FORMAT_PATTERN_.test(e)},i18n.phonenumbers.AsYouTypeFormatter.prototype.narrowDownPossibleFormats_=function(e){for(var t=[],n=e.length-i18n.phonenumbers.AsYouTypeFormatter.MIN_LEADING_DIGITS_LENGTH_,o=this.possibleFormats_.length,r=0;o>r;++r){var d=this.possibleFormats_[r];if(0==d.leadingDigitsPatternCount())t.push(this.possibleFormats_[r]);else{var i=Math.min(n,d.leadingDigitsPatternCount()-1),d=d.getLeadingDigitsPattern(i);0==e.search(d)&&t.push(this.possibleFormats_[r])}}this.possibleFormats_=t},i18n.phonenumbers.AsYouTypeFormatter.prototype.createFormattingTemplate_=function(e){var t=e.getPatternOrDefault();return-1!=t.indexOf("|")?!1:(t=t.replace(i18n.phonenumbers.AsYouTypeFormatter.CHARACTER_CLASS_PATTERN_,"\\d"),t=t.replace(i18n.phonenumbers.AsYouTypeFormatter.STANDALONE_DIGIT_PATTERN_,"\\d"),this.formattingTemplate_.clear(),e=this.getFormattingTemplate_(t,e.getFormatOrDefault()),0<e.length?(this.formattingTemplate_.append(e),!0):!1)},i18n.phonenumbers.AsYouTypeFormatter.prototype.getFormattingTemplate_=function(e,t){var n="999999999999999".match(e)[0];return n.length<this.nationalNumber_.getLength()?"":(n=n.replace(new RegExp(e,"g"),t),n.replace(RegExp("9","g"),this.DIGIT_PLACEHOLDER_))},i18n.phonenumbers.AsYouTypeFormatter.prototype.clear=function(){this.currentOutput_="",this.accruedInput_.clear(),this.accruedInputWithoutFormatting_.clear(),this.formattingTemplate_.clear(),this.lastMatchPosition_=0,this.currentFormattingPattern_="",this.prefixBeforeNationalNumber_.clear(),this.extractedNationalPrefix_="",this.nationalNumber_.clear(),this.ableToFormat_=!0,this.inputHasFormatting_=!1,this.originalPosition_=this.positionToRemember_=0,this.isExpectingCountryCallingCode_=this.isCompleteNumber_=!1,this.possibleFormats_=[],this.shouldAddSpaceAfterNationalPrefix_=!1,this.currentMetadata_!=this.defaultMetadata_&&(this.currentMetadata_=this.getMetadataForRegion_(this.defaultCountry_))},i18n.phonenumbers.AsYouTypeFormatter.prototype.inputDigit=function(e){return this.currentOutput_=this.inputDigitWithOptionToRememberPosition_(e,!1)},i18n.phonenumbers.AsYouTypeFormatter.prototype.inputDigitAndRememberPosition=function(e){return this.currentOutput_=this.inputDigitWithOptionToRememberPosition_(e,!0)},i18n.phonenumbers.AsYouTypeFormatter.prototype.inputDigitWithOptionToRememberPosition_=function(e,t){if(this.accruedInput_.append(e),t&&(this.originalPosition_=this.accruedInput_.getLength()),this.isDigitOrLeadingPlusSign_(e)?e=this.normalizeAndAccrueDigitsAndPlusSign_(e,t):(this.ableToFormat_=!1,this.inputHasFormatting_=!0),!this.ableToFormat_){if(!this.inputHasFormatting_)if(this.attemptToExtractIdd_()){if(this.attemptToExtractCountryCallingCode_())return this.attemptToChoosePatternWithPrefixExtracted_()}else if(this.ableToExtractLongerNdd_())return this.prefixBeforeNationalNumber_.append(i18n.phonenumbers.AsYouTypeFormatter.SEPARATOR_BEFORE_NATIONAL_NUMBER_),this.attemptToChoosePatternWithPrefixExtracted_();return this.accruedInput_.toString()}switch(this.accruedInputWithoutFormatting_.getLength()){case 0:case 1:case 2:return this.accruedInput_.toString();case 3:if(!this.attemptToExtractIdd_())return this.extractedNationalPrefix_=this.removeNationalPrefixFromNationalNumber_(),this.attemptToChooseFormattingPattern_();this.isExpectingCountryCallingCode_=!0;default:if(this.isExpectingCountryCallingCode_)return this.attemptToExtractCountryCallingCode_()&&(this.isExpectingCountryCallingCode_=!1),this.prefixBeforeNationalNumber_.toString()+this.nationalNumber_.toString();if(0<this.possibleFormats_.length){var n=this.inputDigitHelper_(e),o=this.attemptToFormatAccruedDigits_();return 0<o.length?o:(this.narrowDownPossibleFormats_(this.nationalNumber_.toString()),this.maybeCreateNewTemplate_()?this.inputAccruedNationalNumber_():this.ableToFormat_?this.appendNationalNumber_(n):this.accruedInput_.toString())}return this.attemptToChooseFormattingPattern_()}},i18n.phonenumbers.AsYouTypeFormatter.prototype.attemptToChoosePatternWithPrefixExtracted_=function(){return this.ableToFormat_=!0,this.isExpectingCountryCallingCode_=!1,this.possibleFormats_=[],this.attemptToChooseFormattingPattern_()},i18n.phonenumbers.AsYouTypeFormatter.prototype.getExtractedNationalPrefix_=function(){return this.extractedNationalPrefix_},i18n.phonenumbers.AsYouTypeFormatter.prototype.ableToExtractLongerNdd_=function(){if(0<this.extractedNationalPrefix_.length){var e=this.nationalNumber_.toString();this.nationalNumber_.clear(),this.nationalNumber_.append(this.extractedNationalPrefix_),this.nationalNumber_.append(e);var e=this.prefixBeforeNationalNumber_.toString(),t=e.lastIndexOf(this.extractedNationalPrefix_);this.prefixBeforeNationalNumber_.clear(),this.prefixBeforeNationalNumber_.append(e.substring(0,t))}return this.extractedNationalPrefix_!=this.removeNationalPrefixFromNationalNumber_()},i18n.phonenumbers.AsYouTypeFormatter.prototype.isDigitOrLeadingPlusSign_=function(e){return i18n.phonenumbers.PhoneNumberUtil.CAPTURING_DIGIT_PATTERN.test(e)||1==this.accruedInput_.getLength()&&i18n.phonenumbers.PhoneNumberUtil.PLUS_CHARS_PATTERN.test(e)},i18n.phonenumbers.AsYouTypeFormatter.prototype.attemptToFormatAccruedDigits_=function(){for(var e=this.nationalNumber_.toString(),t=this.possibleFormats_.length,n=0;t>n;++n){var o=this.possibleFormats_[n],r=o.getPatternOrDefault();if(new RegExp("^(?:"+r+")$").test(e))return this.shouldAddSpaceAfterNationalPrefix_=i18n.phonenumbers.AsYouTypeFormatter.NATIONAL_PREFIX_SEPARATORS_PATTERN_.test(o.getNationalPrefixFormattingRule()),e=e.replace(new RegExp(r,"g"),o.getFormat()),this.appendNationalNumber_(e)}return""},i18n.phonenumbers.AsYouTypeFormatter.prototype.appendNationalNumber_=function(e){var t=this.prefixBeforeNationalNumber_.getLength();return this.shouldAddSpaceAfterNationalPrefix_&&t>0&&this.prefixBeforeNationalNumber_.toString().charAt(t-1)!=i18n.phonenumbers.AsYouTypeFormatter.SEPARATOR_BEFORE_NATIONAL_NUMBER_?this.prefixBeforeNationalNumber_+i18n.phonenumbers.AsYouTypeFormatter.SEPARATOR_BEFORE_NATIONAL_NUMBER_+e:this.prefixBeforeNationalNumber_+e},i18n.phonenumbers.AsYouTypeFormatter.prototype.getRememberedPosition=function(){if(!this.ableToFormat_)return this.originalPosition_;for(var e=0,t=0,n=this.accruedInputWithoutFormatting_.toString(),o=this.currentOutput_.toString();e<this.positionToRemember_&&t<o.length;)n.charAt(e)==o.charAt(t)&&e++,t++;return t},i18n.phonenumbers.AsYouTypeFormatter.prototype.attemptToChooseFormattingPattern_=function(){var e=this.nationalNumber_.toString();return e.length>=i18n.phonenumbers.AsYouTypeFormatter.MIN_LEADING_DIGITS_LENGTH_?(this.getAvailableFormats_(e),e=this.attemptToFormatAccruedDigits_(),0<e.length?e:this.maybeCreateNewTemplate_()?this.inputAccruedNationalNumber_():this.accruedInput_.toString()):this.appendNationalNumber_(e)},i18n.phonenumbers.AsYouTypeFormatter.prototype.inputAccruedNationalNumber_=function(){var e=this.nationalNumber_.toString(),t=e.length;if(t>0){for(var n="",o=0;t>o;o++)n=this.inputDigitHelper_(e.charAt(o));return this.ableToFormat_?this.appendNationalNumber_(n):this.accruedInput_.toString()}return this.prefixBeforeNationalNumber_.toString()},i18n.phonenumbers.AsYouTypeFormatter.prototype.isNanpaNumberWithNationalPrefix_=function(){if(1!=this.currentMetadata_.getCountryCode())return!1;var e=this.nationalNumber_.toString();return"1"==e.charAt(0)&&"0"!=e.charAt(1)&&"1"!=e.charAt(1)},i18n.phonenumbers.AsYouTypeFormatter.prototype.removeNationalPrefixFromNationalNumber_=function(){var e=this.nationalNumber_.toString(),t=0;if(this.isNanpaNumberWithNationalPrefix_())t=1,this.prefixBeforeNationalNumber_.append("1").append(i18n.phonenumbers.AsYouTypeFormatter.SEPARATOR_BEFORE_NATIONAL_NUMBER_),this.isCompleteNumber_=!0;else if(this.currentMetadata_.hasNationalPrefixForParsing()){var n=new RegExp("^(?:"+this.currentMetadata_.getNationalPrefixForParsing()+")"),n=e.match(n);null!=n&&null!=n[0]&&0<n[0].length&&(this.isCompleteNumber_=!0,t=n[0].length,this.prefixBeforeNationalNumber_.append(e.substring(0,t)))}return this.nationalNumber_.clear(),this.nationalNumber_.append(e.substring(t)),e.substring(0,t)},i18n.phonenumbers.AsYouTypeFormatter.prototype.attemptToExtractIdd_=function(){var e=this.accruedInputWithoutFormatting_.toString(),t=new RegExp("^(?:\\"+i18n.phonenumbers.PhoneNumberUtil.PLUS_SIGN+"|"+this.currentMetadata_.getInternationalPrefix()+")"),t=e.match(t);return null!=t&&null!=t[0]&&0<t[0].length?(this.isCompleteNumber_=!0,t=t[0].length,this.nationalNumber_.clear(),this.nationalNumber_.append(e.substring(t)),this.prefixBeforeNationalNumber_.clear(),this.prefixBeforeNationalNumber_.append(e.substring(0,t)),e.charAt(0)!=i18n.phonenumbers.PhoneNumberUtil.PLUS_SIGN&&this.prefixBeforeNationalNumber_.append(i18n.phonenumbers.AsYouTypeFormatter.SEPARATOR_BEFORE_NATIONAL_NUMBER_),!0):!1},i18n.phonenumbers.AsYouTypeFormatter.prototype.attemptToExtractCountryCallingCode_=function(){if(0==this.nationalNumber_.getLength())return!1;var e=new goog.string.StringBuffer,t=this.phoneUtil_.extractCountryCode(this.nationalNumber_,e);return 0==t?!1:(this.nationalNumber_.clear(),this.nationalNumber_.append(e.toString()),e=this.phoneUtil_.getRegionCodeForCountryCode(t),i18n.phonenumbers.PhoneNumberUtil.REGION_CODE_FOR_NON_GEO_ENTITY==e?this.currentMetadata_=this.phoneUtil_.getMetadataForNonGeographicalRegion(t):e!=this.defaultCountry_&&(this.currentMetadata_=this.getMetadataForRegion_(e)),this.prefixBeforeNationalNumber_.append(""+t).append(i18n.phonenumbers.AsYouTypeFormatter.SEPARATOR_BEFORE_NATIONAL_NUMBER_),this.extractedNationalPrefix_="",!0)},i18n.phonenumbers.AsYouTypeFormatter.prototype.normalizeAndAccrueDigitsAndPlusSign_=function(e,t){var n;return e==i18n.phonenumbers.PhoneNumberUtil.PLUS_SIGN?(n=e,this.accruedInputWithoutFormatting_.append(e)):(n=i18n.phonenumbers.PhoneNumberUtil.DIGIT_MAPPINGS[e],this.accruedInputWithoutFormatting_.append(n),this.nationalNumber_.append(n)),t&&(this.positionToRemember_=this.accruedInputWithoutFormatting_.getLength()),n},i18n.phonenumbers.AsYouTypeFormatter.prototype.inputDigitHelper_=function(e){var t=this.formattingTemplate_.toString();if(0<=t.substring(this.lastMatchPosition_).search(this.DIGIT_PATTERN_)){var n=t.search(this.DIGIT_PATTERN_);return e=t.replace(this.DIGIT_PATTERN_,e),this.formattingTemplate_.clear(),this.formattingTemplate_.append(e),this.lastMatchPosition_=n,e.substring(0,this.lastMatchPosition_+1)}return 1==this.possibleFormats_.length&&(this.ableToFormat_=!1),this.currentFormattingPattern_="",this.accruedInput_.toString()};
 
 var toolbarActions = [
-  {title: 'Re-use', show: 'always'}
+  {}
 ];
 class Contacts extends Component {
 
@@ -414,11 +414,8 @@ class Contacts extends Component {
      this._fetchCurrentPage().done();
   }
 
-  render() {
-    if (this.state.isLoading) {
-      return this.renderLoadingView();
-    }
-    if (Platform.OS === 'android'){
+  renderAndroid() {
+    if(this.state.hasAccount){
       return (
         <Animated.View
           style={{
@@ -432,26 +429,141 @@ class Contacts extends Component {
                         title={this.props.title}
                         navIcon={require('./ic_arrow_back_white_24dp.png')}
                         onIconClicked={this.props.navigator.pop}
-                        actions={toolbarActions}
-                        onActionSelected={this._onActionSelected.bind(this)}
                         titleColor={'black'}/>
           </View>
           <ScrollView>
-            </ScrollView>
+
+        <View style={{flex: 1, marginBottom:50, backgroundColor: '#FFFFFF'}}>
+        {this.state.networkError &&
+          <View style={{flex:1}}>
+               <View style={{alignItems: 'center',justifyContent:'center', width: this.state.width, height: 50,backgroundColor:'#CCCCCC'}}>
+                  <Text style={{color:'#ffffff',fontWeight:'800',}} numberOfLines={1}>No Network, try again later.</Text>
+              </View>
+              <View style={styles.separator} />
           </View>
-        </Animated.View>
+        }
+        <ListView
+            refreshControl={
+              <RefreshControl
+              refreshing={this.state.reloading}
+              onRefresh={this._onRefresh.bind(this)}/>
+            }
+            dataSource={this.state.dataSource}
+            renderRow={this.renderContact.bind(this)}
+            onEndReached={this._onEndReached.bind(this)}
+            style={styles.listView}
+            />
+        </View>
+        </ScrollView>
+      </View>
+    </Animated.View>
       );
+    }else{
+      if(this.state.codeSent){
+        return (
+          <Animated.View
+            style={{
+              height: this.state.height,
+              justifyContent: 'flex-end'
+            }}
+          >
+          <View style={styles.container}>
+            <View>
+              <ToolbarAndroid style={styles.toolbar}
+                          title={this.props.title}
+                          navIcon={require('./ic_arrow_back_white_24dp.png')}
+                          onIconClicked={this.props.navigator.pop}
+                          titleColor={'black'}/>
+            </View>
+            <ScrollView>
+          <View style={styles.container}>
+            <Text style={{marginTop:60, marginLeft:10}}>Type the pin code here</Text>
+            <TextInput
+              controlled={true}
+              style={{fontSize: 20, height: 42, marginTop:10, marginLeft:10, marginRight:10, paddingLeft:5, backgroundColor: '#FFFFFF'}}
+              onChangeText={(codeReceived) => this.setState({codeReceived})}
+            />
+            {this.state.codeIncorrect &&
+              <Text style={{marginLeft:10, color: 'red'}}>Your code is incorrect. Please try again.</Text>
+            }
+            <TouchableHighlight onPress={() => this.verifyCode(this)} underlayColor="#FDF058">
+              <View style={{alignItems: 'center',justifyContent:'center', width: this.viewMaxWidth, height: 40,backgroundColor:'#CCCCCC', marginTop:20, marginLeft: 10, marginRight: 10}}>
+                <Text style={{fontWeight:'800'}}>Done</Text>
+              </View>
+            </TouchableHighlight>
+          </View>
+          </ScrollView>
+        </View>
+      </Animated.View>
+        );
+      }else{
+        return (
+          <Animated.View
+            style={{
+              height: this.state.height,
+              justifyContent: 'flex-end'
+            }}
+          >
+          <View style={styles.container}>
+            <View>
+              <ToolbarAndroid style={styles.toolbar}
+                          title={this.props.title}
+                          navIcon={require('./ic_arrow_back_white_24dp.png')}
+                          onIconClicked={this.props.navigator.pop}
+                          titleColor={'black'}/>
+            </View>
+            <ScrollView>
+          <View style={styles.container}>
+            <Text style={{marginTop:40, marginLeft:10}}>Please sign up first:</Text>
+
+            <Text style={{marginTop:20, marginLeft:10}}>Name</Text>
+            <TextInput
+              controlled={true}
+              style={{fontSize: 20, height: 42, marginTop:10, marginLeft:10, marginRight:10, paddingLeft:5, backgroundColor: '#FFFFFF'}}
+              onChangeText={(name) => this.setState({name})}
+            />
+            {this.state.nameIsEmpty &&
+              <Text style={{marginLeft:10, color: 'red'}}>The name must be set.</Text>
+            }
+            <Text style={{marginTop:10, marginLeft:10}}>Phone Number</Text>
+            <View style={{ height: 42, marginTop:10, marginLeft:10, marginRight:10, paddingLeft:5, backgroundColor: '#FFFFFF'}}>
+            <TelephoneInput onChangeText={(phoneNumber) => this.setState({phoneNumber})}/>
+            </View>
+            {this.state.invalidPhoneNumber &&
+              <Text style={{marginLeft:10, color: 'red'}}>Your phone number is not well formed, please correct it.</Text>
+            }
+            <TouchableHighlight onPress={() => this.createAccount(this)} underlayColor="#FDF058">
+              <View style={{alignItems: 'center',justifyContent:'center', width: this.viewMaxWidth, height: 40,backgroundColor:'#CCCCCC', marginTop:20, marginLeft: 10, marginRight: 10}}>
+                <Text style={{fontWeight:'800'}}>Next</Text>
+              </View>
+            </TouchableHighlight>
+            <Text style={{marginLeft:10}}>You will receive a text message containing a pin code.</Text>
+          </View>
+          </ScrollView>
+        </View>
+      </Animated.View>
+        );
+      }
+    }
+  }
+
+  render() {
+    if (this.state.isLoading) {
+      return this.renderLoadingView();
+    }
+    if (Platform.OS === 'android'){
+      return this.renderAndroid();
     }else{
       if(this.state.hasAccount){
         return (
           <View style={{flex: 1, marginBottom:50}}>
           {this.state.networkError &&
             <View style={{flex:1}}>
-    						 <View style={{alignItems: 'center',justifyContent:'center', width: this.state.width, height: 50,backgroundColor:'#CCCCCC'}}>
-    								<Text style={{color:'#ffffff',fontWeight:'800',}} numberOfLines={1}>No Network, try again later.</Text>
-    						</View>
-    						<View style={styles.separator} />
-    				</View>
+                 <View style={{alignItems: 'center',justifyContent:'center', width: this.state.width, height: 50,backgroundColor:'#CCCCCC'}}>
+                    <Text style={{color:'#ffffff',fontWeight:'800',}} numberOfLines={1}>No Network, try again later.</Text>
+                </View>
+                <View style={styles.separator} />
+            </View>
           }
           <ListView
               refreshControl={
@@ -459,11 +571,11 @@ class Contacts extends Component {
                 refreshing={this.state.reloading}
                 onRefresh={this._onRefresh.bind(this)}/>
               }
-            	dataSource={this.state.dataSource}
-            	renderRow={this.renderContact.bind(this)}
-  						onEndReached={this._onEndReached.bind(this)}
-            	style={styles.listView}
-            	/>
+              dataSource={this.state.dataSource}
+              renderRow={this.renderContact.bind(this)}
+              onEndReached={this._onEndReached.bind(this)}
+              style={styles.listView}
+              />
           </View>
         );
       }else{
@@ -473,7 +585,7 @@ class Contacts extends Component {
               <Text style={{marginTop:60, marginLeft:10}}>Type the pin code here</Text>
               <TextInput
                 controlled={true}
-                style={{fontSize: 20, height: 40, marginTop:10, marginLeft:10, marginRight:10, paddingLeft:5, backgroundColor: '#FFFFFF'}}
+                style={{fontSize: 20, height: 42, marginTop:10, marginLeft:10, marginRight:10, paddingLeft:5, backgroundColor: '#FFFFFF'}}
                 onChangeText={(codeReceived) => this.setState({codeReceived})}
               />
               {this.state.codeIncorrect &&
@@ -494,14 +606,14 @@ class Contacts extends Component {
               <Text style={{marginTop:20, marginLeft:10}}>Name</Text>
               <TextInput
                 controlled={true}
-                style={{fontSize: 20, height: 40, marginTop:10, marginLeft:10, marginRight:10, paddingLeft:5, backgroundColor: '#FFFFFF'}}
+                style={{fontSize: 20, height: 42, marginTop:10, marginLeft:10, marginRight:10, paddingLeft:5, backgroundColor: '#FFFFFF'}}
                 onChangeText={(name) => this.setState({name})}
               />
               {this.state.nameIsEmpty &&
                 <Text style={{marginLeft:10, color: 'red'}}>The name must be set.</Text>
               }
               <Text style={{marginTop:10, marginLeft:10}}>Phone Number</Text>
-              <View style={{ height: 40, marginTop:10, marginLeft:10, marginRight:10, paddingLeft:5, backgroundColor: '#FFFFFF'}}>
+              <View style={{ height: 42, marginTop:10, marginLeft:10, marginRight:10, paddingLeft:5, backgroundColor: '#FFFFFF'}}>
               <TelephoneInput onChangeText={(phoneNumber) => this.setState({phoneNumber})}/>
               </View>
               {this.state.invalidPhoneNumber &&

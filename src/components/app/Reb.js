@@ -54,7 +54,7 @@ class Reb extends Component {
   tweet() {
     KDSocialShare.tweet({
         'text':this.state.rebus,
-        'link':'http://rebbyapp.com',
+        'link':'',
         'imagelink':'',
       },
       (results) => {
@@ -67,7 +67,7 @@ class Reb extends Component {
 
     KDSocialShare.shareOnFacebook({
         'text':this.state.rebus,
-        'link':'http://rebbyapp.com',
+        'link':'',
         'imagelink':'',
       },
       (results) => {
@@ -114,8 +114,6 @@ class Reb extends Component {
                         title={this.props.title}
                         navIcon={require('./ic_arrow_back_white_24dp.png')}
                         onIconClicked={this.props.navigator.pop}
-                        actions={toolbarActions}
-                        onActionSelected={this._onActionSelected.bind(this)}
                         titleColor={'black'}/>
           </View>
           <ScrollView>

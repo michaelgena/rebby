@@ -48,7 +48,7 @@ var styles = StyleSheet.create({
        justifyContent: 'center'
    },
    toolbar: {
-     backgroundColor: '#FFFFFF',
+     backgroundColor: '#FDF058',
      height: 56,
      alignItems: 'center'
    },
@@ -130,9 +130,8 @@ var styles = StyleSheet.create({
 });
 
 var toolbarActions = [
-  {title: 'New', show: 'always'},
   { title: 'Contacts', iconName: 'md-contact', iconSize: 30, show: 'always' },
-  { title: 'Chats', iconName: 'md-chatbubbles', iconSize: 30, show: 'always' },
+  { title: 'Rebs', iconName: 'ios-list-outline', iconSize: 30, show: 'always' },
   { title: 'Settings', iconName: 'md-settings', iconSize: 30, show: 'always' },
 ];
 
@@ -162,7 +161,9 @@ class ChatList extends Component {
   }
 
   addOneToBadge(){
-    this.props.addOneToBadge();
+    if(Platform.OS === 'ios'){
+      this.props.addOneToBadge();
+    }
   }
 
   refreshChatList(){
@@ -317,7 +318,9 @@ class ChatList extends Component {
           let nbMsg = (typeof(chatAsJSON.nbUnreadMessage) != "undefined") ? chatAsJSON.nbUnreadMessage : 0;
           this.nbAllUnreadMessage += nbMsg;
         }
-        PushNotificationIOS.setApplicationIconBadgeNumber(this.nbAllUnreadMessage);
+        if(Platform.OS === 'ios'){
+          PushNotificationIOS.setApplicationIconBadgeNumber(this.nbAllUnreadMessage);
+        }
       })
       .done();
     })
@@ -437,7 +440,9 @@ class ChatList extends Component {
       this.addRebbotMessage(rebs, "H🅰ve ⛽-el+n! ♥");
       AsyncStorage.setItem("rebbot", rebs.toString());
       AsyncStorage.setItem("chatList", chatList.toString());
-      this.props.addOneToBadge();
+      if(Platform.OS === 'ios'){
+        this.props.addOneToBadge();
+      }
     }
   }
 
@@ -498,11 +503,13 @@ class ChatList extends Component {
         }
         if(index > -1){
           chatList.splice(index, 1);
-          if(chatAsJSON.nbUnreadMessage > 0){
+          if(chatAsJSON.nbUnreadMessage > 0 && Platform.OS === 'ios'){
             this.props.removeOneToBadge();
           }
           this.nbAllUnreadMessage -= (typeof(chatAsJSON.nbUnreadMessage) != "undefined") ? chatAsJSON.nbUnreadMessage : 0;
-          PushNotificationIOS.setApplicationIconBadgeNumber(this.nbAllUnreadMessage);
+          if(Platform.OS === 'ios'){
+            PushNotificationIOS.setApplicationIconBadgeNumber(this.nbAllUnreadMessage);
+          }
           chatAsJSON.nbUnreadMessage = 0;
           var chatAsString = JSON.stringify(chatAsJSON);
           chatAsString = chatAsString.replace(/,/g , "|");
@@ -535,8 +542,10 @@ class ChatList extends Component {
   }
 
   _onActionSelected(position) {
-    if(toolbarActions[position].title == "New"){
-      this.navNewReb();
+    if(toolbarActions[position].title == "Rebs"){
+      this.props.navigator.push({
+        id: 'rebList'
+      })
     }
     if(toolbarActions[position].title == "Contacts"){
       this.props.navigator.push({
@@ -550,7 +559,7 @@ class ChatList extends Component {
     }
     if(toolbarActions[position].title == "Settings"){
       this.props.navigator.push({
-        id: 'realtimeRCT'
+        id: 'settings'
       })
     }
   }
@@ -565,7 +574,7 @@ class ChatList extends Component {
       return (
           <View style={{flex: 1}}>
             <Icon.ToolbarAndroid style={styles.toolbar}
-                    title="Home"
+                    title="Rebby"
                     titleColor={'black'}
                     actions={toolbarActions}
                     onActionSelected={this._onActionSelected.bind(this)}/>

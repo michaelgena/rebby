@@ -109,7 +109,8 @@ class NotificationHandler extends Component {
   }
 
   _onNotification(data){
-    console.log("Received notification: " + JSON.stringify(data));
+    console.log("Received notification:");
+    console.log(JSON.stringify(data));
     this.props.getMessages();
   }
 

@@ -15,7 +15,7 @@ class NewReb extends Component {
     let height = (Dimensions.get('window').height);
     let textInputHeight = 0;
     if (Platform.OS === 'android'){
-      textInputHeight = 40;
+      textInputHeight = 25;
     }
 
     this.viewMaxHeight = height;
@@ -37,10 +37,18 @@ class NewReb extends Component {
   }
 
   onKeyboardDidShow(e) {
-    Animated.timing(this.state.height, {
-        toValue: this.viewMaxHeight - (e.endCoordinates.height/2 - 10),
-        duration: 200,
-      }).start();
+    if(Platform.OS === 'android'){
+      console.log("viewMaxHeight from NewReb:"+ this.viewMaxHeight);
+      Animated.timing(this.state.height, {
+          toValue: this.viewMaxHeight,
+          duration: 200,
+        }).start();
+    }else{
+      Animated.timing(this.state.height, {
+          toValue: this.viewMaxHeight - (e.endCoordinates.height/2 - 10),
+          duration: 200,
+        }).start();
+    }
   }
 
   onKeyboardDidHide(e){
@@ -75,7 +83,7 @@ class NewReb extends Component {
     KDSocialShare.shareOnFacebook({
         'text':this.state.rebus,
         'link':'',
-        'imagelink':'https://lh3.googleusercontent.com/Dffl5I2uYfuNhNeT2pMkHzJWjn99lz1uox4dEjRtwXA9OO5sO81h-oO8jmSkOFFFj3vwb7r7Z_qpIsoC3EKtTKc1M1MR',
+        'imagelink':'',
       },
       (results) => {
         console.log(results);
@@ -159,7 +167,7 @@ class NewReb extends Component {
         {Platform.OS === 'android' &&
         <View style={styles.shareContainer}>
           <TouchableHighlight onPress={this.copyToClipboard.bind(this)}>
-            <View style={{flex:1, flexDirection: 'row', alignItems: 'center',justifyContent:'center', width: this.viewMaxWidth/3, height: 50,backgroundColor:'#CCCCCC'}}>
+            <View style={{flex:1, flexDirection: 'row', alignItems: 'center',justifyContent:'center', width: this.viewMaxWidth, height: 50,backgroundColor:'#CCCCCC'}}>
               <Text style={{color:'#ffffff',fontWeight:'800',}}>Copy </Text><Icon name="ios-clipboard" size={25} color="#FFFFFF"/>
             </View>
           </TouchableHighlight>
@@ -170,32 +178,68 @@ class NewReb extends Component {
   }
 
   render(){
-    return (
-      <Animated.View
-        style={{
-          height: this.state.height,
-          justifyContent: 'flex-end'
-        }}
-      >
-      <ListView ref="list"
-        onKeyboardDidShow={this.onKeyboardDidShow.bind(this)}
-        onKeyboardDidHide={this.onKeyboardDidHide.bind(this)}
 
-        dataSource={this.state.dataSource}
-        renderRow={this.renderMessage.bind(this)}
-        style={styles.listView}
-      />
-      <KeyboardAvoidingView behavior='padding'>
-        <RebInput
-          isReb={true}
-          buttonLabel={"Done"}
-          fetchData={this.fetchData.bind(this)}
-          resetData={this.resetData.bind(this)}
+    if(Platform.OS === 'android'){
+      return (
+        <Animated.View
+          style={{
+            height: this.state.height,
+            justifyContent: 'flex-end'
+          }}
+        >
+        <View style={styles.container}>
+        <View>
+          <ToolbarAndroid style={styles.toolbar}
+                      title={this.props.title}
+                      navIcon={require('./ic_arrow_back_white_24dp.png')}
+                      onIconClicked={this.props.navigator.pop}
+                      titleColor={'black'}/>
+        </View>
+        <ListView ref="list"
+          dataSource={this.state.dataSource}
+          renderRow={this.renderMessage.bind(this)}
+          style={styles.listView}
         />
-      </KeyboardAvoidingView>
-      <MessageBarAlert ref="alert" />
-      </Animated.View>
-    );
+        <KeyboardAvoidingView behavior='padding'>
+          <RebInput
+            isReb={true}
+            buttonLabel={"Done"}
+            fetchData={this.fetchData.bind(this)}
+            resetData={this.resetData.bind(this)}
+          />
+        </KeyboardAvoidingView>
+        </View>
+        <MessageBarAlert ref="alert"/>
+        </Animated.View>
+      );
+    }else{
+      return (
+        <Animated.View
+          style={{
+            height: this.state.height,
+            justifyContent: 'flex-end'
+          }}
+        >
+        <ListView ref="list"
+          onKeyboardDidShow={this.onKeyboardDidShow.bind(this)}
+          onKeyboardDidHide={this.onKeyboardDidHide.bind(this)}
+
+          dataSource={this.state.dataSource}
+          renderRow={this.renderMessage.bind(this)}
+          style={styles.listView}
+        />
+        <KeyboardAvoidingView behavior='padding'>
+          <RebInput
+            isReb={true}
+            buttonLabel={"Done"}
+            fetchData={this.fetchData.bind(this)}
+            resetData={this.resetData.bind(this)}
+          />
+        </KeyboardAvoidingView>
+        <MessageBarAlert ref="alert" />
+        </Animated.View>
+      );
+    }
   }
 }
 const styles = StyleSheet.create({

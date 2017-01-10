@@ -33,7 +33,7 @@ var RealtimeRCT = React.createClass({
     RCTRealtimeMessaging.RTEventListener("onException",this._onException),
     RCTRealtimeMessaging.RTEventListener("onMessage",this._onMessage),
     RCTRealtimeMessaging.RTEventListener("onPresence",this._onPresence);
-    RCTRealtimeMessaging.RTCPushNotificationListener(this._onNotification);
+    RCTRealtimeMessaging.RTPushNotificationListener(this._onNotification);
 
     RCTRealtimeMessaging.RTConnect(
     {
@@ -45,9 +45,9 @@ var RealtimeRCT = React.createClass({
     });
   },
 
-  componentDidMount: function(){
+  /*componentDidMount: function(){
       RCTRealtimeMessaging.RTPushNotificationListener(this._onNotification);
-  },
+  },*/
 
   _onNotification: function(data) {
      this._log("Received push notification: " + JSON.stringify(data));

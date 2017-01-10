@@ -24,10 +24,10 @@ class RebChat extends Component {
     let height = (Dimensions.get('window').height);
     let textInputHeight = 0;
     if (Platform.OS === 'android'){
-      textInputHeight = 40;
+      textInputHeight = 25;
     }
 
-    this.viewMaxHeight = height;
+    this.viewMaxHeight = height + textInputHeight;
 
     this.state = {
        isLoading: true,
@@ -59,22 +59,6 @@ class RebChat extends Component {
     this._hasNextPage = true;
     this._messages = [];
 
-    //RCTRealtimeMessaging.RTEventListener("onConnected",this._onConnected.bind(this)),
-    //RCTRealtimeMessaging.RTEventListener("onDisconnected",this._onDisconnected),
-    //RCTRealtimeMessaging.RTEventListener("onSubscribed",this._onSubscribed.bind(this)),
-    //RCTRealtimeMessaging.RTEventListener("onUnSubscribed",this._onUnSubscribed),
-    //RCTRealtimeMessaging.RTEventListener("onException",this._onException),
-    //RCTRealtimeMessaging.RTEventListener("onMessage",this._onMessage.bind(this));
-    //RCTRealtimeMessaging.RTEventListener("onPresence",this._onPresence);
-
-    /*RCTRealtimeMessaging.RTConnect(
-    {
-      appKey: this.state.appKey,
-      token: this.state.token,
-      connectionMetadata: this.state.connectionMetadata,
-      clusterUrl: this.state.clusterUrl
-    });*/
-
     AsyncStorage.getItem("userInfo").then((userInfo) => {
       if(userInfo != null){
         userInfo = userInfo.replace(/\|/g , ",");
@@ -105,61 +89,6 @@ class RebChat extends Component {
   componentWillUnmount() {
 
   }
-
-  /*_onConnected(){
-    console.log('Connected!');
-    console.log('Trying to subscribe...');
-    RCTRealtimeMessaging.RTSubscribeWithNotifications(this.state.channel, true);
-  }*/
-
-  /*_onSubscribed(subscribedEvent){
-    console.log('Subscribed!');
-  }*/
-
-  /*_onException(exceptionEvent){
-    //this._log("Exception:" + exceptionEvent.error);
-    console.log("Exception:" + exceptionEvent.error);
-  }*/
-
-  /*_onMessage(messageEvent){
-    console.log("received message on RebChat: ["+messageEvent.message+"] on channel [" + messageEvent.channel+"]");
-
-    AsyncStorage.getItem(this.state.channel).then((messages) => {
-      //TODO load only last 10 messages
-      if(messages !== null){
-        messages = messages.split(",");
-        //Check if it isn't a message that I just wrote
-        if(messages[messages.length-1] !== messageEvent.message){
-          messageEvent.message = messageEvent.message.replace(/\|/g , ",");
-          messageEvent.message = messageEvent.message.replace(/\\"/g , "\"");
-          var msg = JSON.parse(messageEvent.message);
-          msg.in = true;
-          var messageAsString = JSON.stringify(msg);
-          messageAsString = messageAsString.replace(/,/g , "|");
-          messageAsString = messageAsString.replace(/"/g , "\\\"");
-          messages.push(messageAsString);
-          AsyncStorage.setItem(this.state.channel, messages.toString());
-        }
-        this.state.nbItems = messages.length;
-        console.log("Messages Length: "+this.state.nbItems);
-
-        this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(messages),
-          isLoading: false,
-          reloading: false
-        });
-      }else{
-        console.log("it's empty");
-        var messages = [];
-        messages.push(messageEvent.message);
-        this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(messages),
-          isLoading: false,
-          reloading: false
-        });
-      }
-    }).done();
-  }*/
 
   _onRefresh() {
     this.setState({
@@ -222,10 +151,17 @@ class RebChat extends Component {
   }
 
   onKeyboardDidShow(e) {
-    Animated.timing(this.state.height, {
-        toValue: this.viewMaxHeight - (e.endCoordinates.height/2 - 10),
-        duration: 200,
-      }).start();
+    if(Platform.OS === 'android'){
+      Animated.timing(this.state.height, {
+          toValue: this.viewMaxHeight - 40,
+          duration: 200,
+        }).start();
+    }else{
+      Animated.timing(this.state.height, {
+          toValue: this.viewMaxHeight - (e.endCoordinates.height/2 - 10),
+          duration: 200,
+        }).start();
+    }
   }
 
   onKeyboardDidHide(e){
@@ -238,7 +174,7 @@ class RebChat extends Component {
   tweet(reb) {
     KDSocialShare.tweet({
         'text':reb,
-        'link':'http://rebbyapp.com',
+        'link':'',
         'imagelink':'',
       },
       (results) => {
@@ -250,7 +186,7 @@ class RebChat extends Component {
   shareOnFacebook(reb) {
     KDSocialShare.shareOnFacebook({
         'text':reb,
-        'link':'http://rebbyapp.com',
+        'link':'',
         'imagelink':'',
       },
       (results) => {
@@ -336,86 +272,46 @@ class RebChat extends Component {
 
     if(Platform.OS === 'android'){
       return (
-        <View
+
+        <Animated.View
           style={{
             height: this.state.height,
             justifyContent: 'flex-end'
           }}
         >
-          <View style={styles.container}>
-          <View>
             <ToolbarAndroid style={styles.toolbar}
-                        title={this.props.title}
+                        title={this.props.givenName}
                         navIcon={require('./ic_arrow_back_white_24dp.png')}
                         onIconClicked={this.props.navigator.pop}
                         titleColor={'black'}/>
-          </View>
-          <ScrollView
-          onKeyboardDidShow={this.onKeyboardDidShow.bind(this)}
-          onKeyboardDidHide={this.onKeyboardDidHide.bind(this)}
-          >
 
-            <ListView ref="list"
-              refreshControl={
-                <RefreshControl
-                refreshing={this.state.reloading}
-                onRefresh={this._onRefresh.bind(this)}/>
-              }
-              dataSource={this.state.dataSource}
-              renderRow={this.renderMessage.bind(this)}
-              style={styles.listView}
-            />
 
-          </ScrollView>
-          <RebInput
-            realtimeMessaging={RCTRealtimeMessaging}
-            channel={this.state.channel}
-            appKey={this.state.appKey}
-            privateKey={this.state.token}
-            myUserName={this.state.myUserName}
-            myToken={this.state.myToken}
-            destinatorToken={this.state.destinatorToken}
-            fetchData={this.fetchData.bind(this)}
-            buttonLabel={"Send"}
-          />
-          </View>
-        </View>
-      );
-    }
-    return (
-      <Animated.View
-        style={{
-          height: this.state.height,
-          justifyContent: 'flex-end'
-        }}
-      >
-        <ListView ref="list"
-          onKeyboardDidShow={this.onKeyboardDidShow.bind(this)}
-          onKeyboardDidHide={this.onKeyboardDidHide.bind(this)}
-          refreshControl={
-            <RefreshControl
-            refreshing={this.state.reloading}
-            onRefresh={this._onRefresh.bind(this)}/>
-          }
-          dataSource={this.state.dataSource}
-          renderRow={this.renderMessage.bind(this)}
-          style={styles.listView}
-          onLayout={(event) => {
-            var layout = event.nativeEvent.layout;
-            this.setState({
-              listHeight : layout.height
-            });
-          }}
-          renderFooter={() => {
-            return <View onLayout={(event)=>{
+          <ListView ref="list"
+            onKeyboardDidShow={this.onKeyboardDidShow.bind(this)}
+            onKeyboardDidHide={this.onKeyboardDidHide.bind(this)}
+            refreshControl={
+              <RefreshControl
+              refreshing={this.state.reloading}
+              onRefresh={this._onRefresh.bind(this)}/>
+            }
+            dataSource={this.state.dataSource}
+            renderRow={this.renderMessage.bind(this)}
+            style={styles.listView}
+            onLayout={(event) => {
               var layout = event.nativeEvent.layout;
               this.setState({
-                footerY : layout.y
+                listHeight : layout.height
               });
-            }}></View>
-          }}
-        />
-        <KeyboardAvoidingView behavior='padding'>
+            }}
+            renderFooter={() => {
+              return <View onLayout={(event)=>{
+                var layout = event.nativeEvent.layout;
+                this.setState({
+                  footerY : layout.y
+                });
+              }}></View>
+            }}
+          />
           <RebInput
             realtimeMessaging={RCTRealtimeMessaging}
             channel={this.state.channel}
@@ -427,10 +323,59 @@ class RebChat extends Component {
             fetchData={this.fetchData.bind(this)}
             buttonLabel={"Send"}
           />
-        </KeyboardAvoidingView>
+          </Animated.View>
+      );
+    }else{
+      return (
+        <Animated.View
+          style={{
+            height: this.state.height,
+            justifyContent: 'flex-end'
+          }}
+        >
+          <ListView ref="list"
+            onKeyboardDidShow={this.onKeyboardDidShow.bind(this)}
+            onKeyboardDidHide={this.onKeyboardDidHide.bind(this)}
+            refreshControl={
+              <RefreshControl
+              refreshing={this.state.reloading}
+              onRefresh={this._onRefresh.bind(this)}/>
+            }
+            dataSource={this.state.dataSource}
+            renderRow={this.renderMessage.bind(this)}
+            style={styles.listView}
+            onLayout={(event) => {
+              var layout = event.nativeEvent.layout;
+              this.setState({
+                listHeight : layout.height
+              });
+            }}
+            renderFooter={() => {
+              return <View onLayout={(event)=>{
+                var layout = event.nativeEvent.layout;
+                this.setState({
+                  footerY : layout.y
+                });
+              }}></View>
+            }}
+          />
+          <KeyboardAvoidingView behavior='padding'>
+            <RebInput
+              realtimeMessaging={RCTRealtimeMessaging}
+              channel={this.state.channel}
+              appKey={this.state.appKey}
+              privateKey={this.state.token}
+              myUserName={this.state.myUserName}
+              myToken={this.state.myToken}
+              destinatorToken={this.state.destinatorToken}
+              fetchData={this.fetchData.bind(this)}
+              buttonLabel={"Send"}
+            />
+          </KeyboardAvoidingView>
 
-      </Animated.View>
-    );
+        </Animated.View>
+      );
+    }
   }
 }
 
@@ -539,7 +484,7 @@ const styles = StyleSheet.create({
      flexDirection: 'column',
    },
    toolbar: {
-     backgroundColor: '#FFFFFF',
+     backgroundColor: '#FDF058',
      height: 56,
      alignItems: 'center'
    },
@@ -547,7 +492,7 @@ const styles = StyleSheet.create({
      flex:1,
      alignSelf: 'stretch',
      flexDirection: 'row',
-   },
+   }
 })
 
 export default RebChat;
