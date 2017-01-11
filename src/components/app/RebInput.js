@@ -54,7 +54,7 @@ class RebInput extends Component {
     var STATUS_BAR_HEIGHT = Navigator.NavigationBar.Styles.General.StatusBarHeight;
     this.viewMaxHeight = 95 + textInputHeight;
     if (Platform.OS === 'android'){
-      this.viewMaxHeight = 55 + textInputHeight;
+      this.viewMaxHeight = 45 + textInputHeight;
     }
 
     this.viewMaxWidth = Dimensions.get('window').width;
@@ -173,7 +173,6 @@ class RebInput extends Component {
         }).start();
     }
     if (Platform.OS === 'android'){
-      console.log("viewMaxHeight from RebInput:"+ this.viewMaxHeight);
       Animated.timing(this.state.height, {
           toValue: e.endCoordinates.height,
           duration: 200,
@@ -186,7 +185,6 @@ class RebInput extends Component {
         toValue: this.viewMaxHeight,
         duration: 200,
       }).start();
-
   }
 
   buttonClicked() {

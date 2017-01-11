@@ -91,6 +91,8 @@ class RebChat extends Component {
   }
 
   _onRefresh() {
+    //bug fix for android keyboardDidShow event
+    AsyncStorage.setItem("reloaded", "true");
     this.setState({
       reloading: true,
       reloaded: true
@@ -152,10 +154,19 @@ class RebChat extends Component {
 
   onKeyboardDidShow(e) {
     if(Platform.OS === 'android'){
-      Animated.timing(this.state.height, {
-          toValue: this.viewMaxHeight - 40,
-          duration: 200,
-        }).start();
+      AsyncStorage.getItem("reloaded").then((reloaded) => {
+      if(reloaded === "true"){
+        Animated.timing(this.state.height, {
+            toValue: this.viewMaxHeight - (e.endCoordinates.height/2 + 160),
+            duration: 200,
+          }).start();
+      }else{
+        Animated.timing(this.state.height, {
+            toValue: this.viewMaxHeight - 40,
+            duration: 200,
+          }).start();
+      }
+      });
     }else{
       Animated.timing(this.state.height, {
           toValue: this.viewMaxHeight - (e.endCoordinates.height/2 - 10),
@@ -278,6 +289,7 @@ class RebChat extends Component {
             height: this.state.height,
             justifyContent: 'flex-end'
           }}
+
         >
             <ToolbarAndroid style={styles.toolbar}
                         title={this.props.givenName}
@@ -370,6 +382,7 @@ class RebChat extends Component {
               destinatorToken={this.state.destinatorToken}
               fetchData={this.fetchData.bind(this)}
               buttonLabel={"Send"}
+
             />
           </KeyboardAvoidingView>
 

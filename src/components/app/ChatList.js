@@ -193,6 +193,8 @@ class ChatList extends Component {
         this.getMessages();
       }
     }).done();
+    //bug fix for android keyboardDidShow event
+    AsyncStorage.setItem("reloaded", "false");
   }
 
   _handleAppStateChange(currentAppState){
