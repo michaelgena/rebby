@@ -12,8 +12,18 @@ class Settings extends Component {
     this.state = {
        hasAccount:false,
        isLoading: true,
-       userInfo:""
+       userInfo:"",
+       language: "EN"
     };
+
+    AsyncStorage.getItem("language").then((language) => {
+      if(language !== null){
+        this.setState({
+          language: language
+        });
+      }
+      AsyncStorage.setItem("language", this.state.language);
+    });
   }
 
   fetchData(){
@@ -48,6 +58,20 @@ class Settings extends Component {
       hasAccount: false,
       userInfo: ""
     });
+  }
+
+  switchLanguage(){
+    if(this.state.language === "EN"){
+      this.setState({
+          language: "FR"
+      });
+      AsyncStorage.setItem("language", "FR");
+    }else if(this.state.language === "FR"){
+      this.setState({
+          language: "EN"
+      });
+      AsyncStorage.setItem("language", "EN");
+    }
   }
 
   renderLoadingView() {
@@ -142,6 +166,29 @@ class Settings extends Component {
                     </TouchableHighlight>
                   </View>
                 </View>
+                <Text style={{marginTop:20, marginLeft:5, fontWeight:'bold', fontSize: 20}}>Preferences</Text>
+
+                <View style={styles.separator} />
+                <View>
+                  <View style={{flex:1, flexDirection: 'row'}}>
+                    <TouchableHighlight
+                      onPress={this.switchLanguage.bind(this)}
+                      underlayColor="#FFFFFF"
+                    >
+                      <View>
+                        <View>
+                          <Text style={{marginLeft:5}}>Default Language</Text>
+                        </View>
+                        <View>
+                          <Text style={{marginLeft:5}}>
+                          {this.state.language}
+                          </Text>
+                        </View>
+                      </View>
+                    </TouchableHighlight>
+                  </View>
+                </View>
+                <View style={styles.separator} />
               </ScrollView>
             </View>
             </Animated.View>
@@ -188,6 +235,29 @@ class Settings extends Component {
                 </View>
               </TouchableHighlight>
             </View>
+
+            <View style={styles.separator} />
+            <View>
+              <View style={{flex:1, flexDirection: 'row'}}>
+                <TouchableHighlight
+                  onPress={this.switchLanguage.bind(this)}
+                  underlayColor="#FFFFFF"
+                >
+                  <View>
+                    <View>
+                      <Text style={{marginLeft:5}}>Default Language</Text>
+                    </View>
+                    <View>
+                      <Text style={{marginLeft:5}}>
+                      {this.state.language}
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableHighlight>
+              </View>
+            </View>
+            <View style={styles.separator} />
+            
           </View>
         );
       }
@@ -246,6 +316,17 @@ const styles = StyleSheet.create({
   toolbar: {
     backgroundColor: '#FDF058',
     height: 56,
+  },
+  languageButton: {
+    marginTop: 3,
+    marginRight: 5,
+    marginLeft: 2,
+  },
+  separator: {
+     height: 1,
+     backgroundColor: '#DDDDDD',
+     marginTop: 10,
+     marginBottom: 10
   },
 
 })

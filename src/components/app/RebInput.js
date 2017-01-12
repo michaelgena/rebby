@@ -75,6 +75,16 @@ class RebInput extends Component {
        isConnected:false,
        networkError:false
     };
+
+    AsyncStorage.getItem("language").then((language) => {
+      if(language !== null){
+        this.setState({
+          language: language
+        });
+      }else{
+        AsyncStorage.setItem("language", this.state.language);
+      }
+    });
   }
 
   componentDidMount() {

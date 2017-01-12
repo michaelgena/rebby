@@ -463,6 +463,8 @@ class ChatList extends Component {
   }
 
   _onRefresh() {
+    //bug fix for android keyboardDidShow event
+    AsyncStorage.setItem("reloaded", "true");
     this.setState({reloading: true});
     //this.getMessages();
     this.fetchData();

@@ -71,7 +71,6 @@ class RebChat extends Component {
         });
       }
     }).done();
-
   }
 
   componentDidMount() {
