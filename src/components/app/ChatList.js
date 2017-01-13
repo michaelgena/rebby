@@ -594,6 +594,7 @@ class ChatList extends Component {
   						onEndReached={this._onEndReached.bind(this)}
             	style={styles.listView}
             	/>
+              <NotificationHandler addOneToBadge={this.addOneToBadge.bind(this)} refreshChatList={this.refreshChatList.bind(this)} getMessages={this.getMessages.bind(this)}/>
           </View>
         </View>
       );
@@ -644,6 +645,32 @@ class ChatList extends Component {
     chat = chat.replace(/\|/g , ",");
     chat = chat.replace(/\\"/g , "\"");
     var rebChat = JSON.parse(chat);
+
+    var sendDateAsString = "";
+    if(rebChat.lastDate !== ""){
+      var sendDate = new Date(0);
+      console.log("rebChat: "+ rebChat.lastDate);
+      sendDate.setUTCSeconds(rebChat.lastDate/1000);
+      var sendHours = sendDate.getHours();
+      sendHours = ("0" + sendHours).slice(-2);
+      var sendMinutes = sendDate.getMinutes();
+      sendMinutes = ("0" + sendMinutes).slice(-2);
+      var now = new Date();
+
+      var diff = Math.floor((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(sendDate.getFullYear(), sendDate.getMonth(), sendDate.getDate()) ) /(1000 * 60 * 60 * 24));
+      if(diff === 0){
+        sendDateAsString = sendHours + ':' + sendMinutes;
+      }else if(diff < 8){
+        var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        var day = days[ sendDate.getDay() ];
+        sendDateAsString = (diff === 1)? 'Yesterday' : day;
+      }else{
+        var months = ['Jan.','Feb.','March','Apr.','May','June','July','Aug.','Sept.','Oct.','Nov.','Dec.'];
+        var month = months[ sendDate.getMonth() ];
+        sendDateAsString = sendDate.getDate() + ' ' + month + (now.getFullYear() === sendDate.getFullYear() ? '' : sendDate.getFullYear());
+      }
+    }
+
 		return (
   		<TouchableHighlight onPress={ () => this.navRebChat(rebChat)} underlayColor="#FFFFFF">
 					<View style={{flex:1, flexDirection: 'row'}}>
@@ -673,8 +700,12 @@ class ChatList extends Component {
 						    <View style={{width: this.state.width-50}}>
 									<Text style={ Platform.OS === 'ios' ? styles.rebus : styles.rebusAndroid} numberOfLines={1}>{rebChat.lastMessage}</Text>
 							  </View>
+                <View style={{alignSelf:'stretch', width: this.state.width-70}}>
+                  <Text style={{alignSelf: 'flex-end', fontSize: 10}}>{sendDateAsString}</Text>
+                </View>
 							  <View style={styles.separator} />
               </View>
+
 					</View>
 			</TouchableHighlight>
 		);

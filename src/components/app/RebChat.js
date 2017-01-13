@@ -28,7 +28,7 @@ class RebChat extends Component {
     }
 
     this.viewMaxHeight = height + textInputHeight;
-
+    this.previousSendDate = 0;
     this.state = {
        isLoading: true,
        reloading: false,
@@ -224,14 +224,49 @@ class RebChat extends Component {
     message = message.replace(/\\"/g , "\"");
 
     var msg = JSON.parse(message);
+
+    var sendDate = new Date(0);
+    sendDate.setUTCSeconds(msg.date/1000);
+    var sendHours = sendDate.getHours();
+    sendHours = ("0" + sendHours).slice(-2);
+    var sendMinutes = sendDate.getMinutes();
+    sendMinutes = ("0" + sendMinutes).slice(-2);
+    var now = new Date();
+    var sendDateAsString = "";
+
+    var diff = Math.floor((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(sendDate.getFullYear(), sendDate.getMonth(), sendDate.getDate()) ) /(1000 * 60 * 60 * 24));
+
+    var previousSendDate = new Date(0);
+    previousSendDate.setUTCSeconds(this.previousSendDate);
+
+    if(sendDate.getMonth() === previousSendDate.getMonth() && sendDate.getDate() === previousSendDate.getDate() && sendDate.getFullYear() === previousSendDate.getFullYear()){
+      sendDateAsString = "";
+    }else if(diff === 0){
+      sendDateAsString = "Today";
+    }else if(diff < 8){
+      var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      var day = days[ sendDate.getDay() ];
+      sendDateAsString = (diff === 1)? 'Yesterday' : day;
+    }else{
+      var months = ['Jan.','Feb.','March','Apr.','May','June','July','Aug.','Sept.','Oct.','Nov.','Dec.'];
+      var month = months[ sendDate.getMonth() ];
+      sendDateAsString = sendDate.getDate() + ' ' + month + (now.getFullYear() === sendDate.getFullYear() ? '' : ' ' + sendDate.getFullYear());
+    }
+
+    var sendTime = sendHours + ':' + sendMinutes;
+    this.previousSendDate = msg.date/1000;
+
     if(msg.in !== null && msg.in == true){
       var reb = msg.rebus.replace(/ /g, "\u2000");
       return (
         <View>
+          <Text style={{alignSelf: 'center'}}>{sendDateAsString}</Text>
           <View style={{flex:1, flexDirection: 'row',justifyContent:'flex-start'}}>
             <View style={{flex:1, flexDirection: 'column',}}>
               <Text style={Platform.OS === 'android'? styles.leftRebusAndroid : styles.leftRebus}>{msg.rebus.replace(/ /g, "\u2000")}</Text>
-
+              <View style={{alignSelf: 'stretch', backgroundColor: '#f4f4f4', marginRight: 5, marginLeft: 20}}>
+                <Text style={{alignSelf: 'flex-end'}}>{sendTime}</Text>
+              </View>
               {typeof(msg.share) != "undefined"  &&
               <View style={{marginLeft: 20, marginRight: 5}}>
                 <ScrollView>
@@ -266,10 +301,14 @@ class RebChat extends Component {
     }
       return (
         <View>
+          <Text style={{alignSelf: 'center'}}>{sendDateAsString}</Text>
           <View style={{flex:1, flexDirection: 'row',}}>
             <View style={{width:60}}/>
             <View style={{flex:1, flexDirection: 'column',}}>
               <Text style={Platform.OS === 'android'? styles.rebusAndroid : styles.rebus}>{msg.rebus.replace(/ /g, "\u2000")}</Text>
+              <View style={{alignSelf: 'stretch', backgroundColor: '#FDF058', marginLeft: 5, marginRight: 20}}>
+                <Text style={{alignSelf: 'flex-end'}}>{sendTime}</Text>
+              </View>
               <View style={styles.triangleCorner} />
             </View>
           </View>

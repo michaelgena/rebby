@@ -1,6 +1,5 @@
-package com.rebby;
+package com.dailyglancer.Rebby;
 
-import com.facebook.react.ReactActivity;
 import co.realtime.reactnativemessagingandroid.RealtimePushNotificationActivity;
 
 public class MainActivity extends RealtimePushNotificationActivity {
