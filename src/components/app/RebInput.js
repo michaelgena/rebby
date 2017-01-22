@@ -121,6 +121,7 @@ class RebInput extends Component {
     payload.UsrToken = this.props.myToken;
     payload.UsrName = this.props.myUserName;
     payload.date = message.date;
+    payload.timeZoneOffset = new Date().getTimezoneOffset();
     payload.channel = this.props.channel;
     payload.message = message.rebus;
     payload.text = message.text;
@@ -161,6 +162,16 @@ class RebInput extends Component {
       });
       console.error(error);
     }).done();
+
+    AsyncStorage.getItem("nbMessagesSent").then((result) => {
+      var nbMessagesSent = 1;
+      if(result != null){
+        nbMessagesSent = parseInt(result) + 1;
+      }
+      AsyncStorage.setItem("nbMessagesSent", nbMessagesSent.toString());
+    }).done();
+
+
   }
 
   _onMessage(messageEvent){

@@ -1,7 +1,7 @@
 //'use strict';
 
 import React, { Component } from 'react';
-import { View, Text, StyleSheet,ListView,TouchableHighlight,ActivityIndicatorIOS, AsyncStorage, Platform, ToolbarAndroid, Dimensions, RefreshControl, Image, ScrollView, Animated, AppState, PushNotificationIOS } from 'react-native';
+import { View, Text, StyleSheet,ListView,TouchableHighlight,ActivityIndicatorIOS, AsyncStorage, Platform, ToolbarAndroid, Dimensions, RefreshControl, Image, ScrollView, Animated, AppState, PushNotificationIOS, Alert, Linking } from 'react-native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import RebChat from './RebChat';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -158,6 +158,7 @@ class ChatList extends Component {
      this.nbAllUnreadMessage = 0;
      this.userToken = "";
      this.fetchData();
+
   }
 
   addOneToBadge(){
@@ -195,11 +196,61 @@ class ChatList extends Component {
     }).done();
     //bug fix for android keyboardDidShow event
     AsyncStorage.setItem("reloaded", "false");
+
+    AsyncStorage.getItem("ask").then((result) => {
+      var ask = result != null && result === "true" || result === null;
+      AsyncStorage.getItem("nbMessagesSent").then((res) => {
+        var nbMessagesSent = (res != null)? parseInt(res) : 0;
+        if(ask && nbMessagesSent > 0 && nbMessagesSent % 3 === 0){
+          this.doYouLikeRebby();
+        }
+      }).done();
+    }).done();
+  }
+
+  doYouLikeRebby(){
+    Alert.alert(
+              'Do you like Rebby?',
+              null,
+              [
+                {text: 'Yes', onPress: () => this.rateRebby()},
+                {text: 'No', onPress: () => AsyncStorage.setItem("ask", "false")}
+              ]
+            )
+  }
+
+  rateRebby(){
+    let storeUrl = Platform.OS === 'ios' ?
+			'http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=1124612045&pageNumber=0&sortOrdering=2&type=Purple+Software&mt=8' :
+			'market://details?id=com.dailyglancer.Rebby';
+
+		Alert.alert(
+			"Thanks!",
+      "We think you're awesome too! Would you mind taking a quick moment to leave us a positive review?",
+			[
+				{ text: "Don't ask again", onPress: () => { AsyncStorage.setItem("ask", "false")} },
+				{ text: "Maybe later...", onPress: () => { AsyncStorage.setItem("ask", "true")} },
+				{ text: "Sure!", onPress: () => {
+          AsyncStorage.setItem("ask", "false");
+					Linking.openURL(storeUrl);
+				}, style: 'cancel' }
+			]
+		);
+
   }
 
   _handleAppStateChange(currentAppState){
     if(currentAppState == "active"){
       this.getMessages();
+      AsyncStorage.getItem("ask").then((result) => {
+        var ask = result != null && result === "true" || result === null;
+        AsyncStorage.getItem("nbMessagesSent").then((res) => {
+          var nbMessagesSent = (res != null)? parseInt(res) : 0;
+          if(ask && nbMessagesSent > 0 && nbMessagesSent % 3 === 0){
+            this.doYouLikeRebby();
+          }
+        }).done();
+      }).done();
     }
   }
   /*_onRegistered(deviceToken) {
@@ -212,6 +263,26 @@ class ChatList extends Component {
      }]
    );
   }*/
+
+  //TODO
+  updateAppNotice(){
+     const APP_STORE_LINK = 'itms://itunes.apple.com/us/app/apple-store/myiosappid?mt=8';
+     const PLAY_STORE_LINK = 'market://details?id=myandroidappid';
+     Alert.alert(
+        'Update Available',
+        'This version of the app is outdated. Please update app from the '+(Platform.OS =='ios' ? 'app store' : 'play store')+'.',
+        [
+            {text: 'Update Now', onPress: () => {
+                if(Platform.OS =='ios'){
+                    Linking.openURL(APP_STORE_LINK).catch(err => console.error('An error occurred', err));
+                }
+                else{
+                    Linking.openURL(PLAY_STORE_LINK).catch(err => console.error('An error occurred', err));
+                }
+            }},
+        ]
+    );
+  }
 
   getMessages(){
 
@@ -257,7 +328,8 @@ class ChatList extends Component {
   }
 
   updateChatList(messages){
-    //console.log("Received messages: " + JSON.stringify(messages));
+    //bug fix for android keyboardDidShow event
+    AsyncStorage.setItem("reloaded", "true");
     //Update the chat list
     var chatList = [];
     var nbUnreadMessage = 0;
@@ -295,6 +367,9 @@ class ChatList extends Component {
         chat.usrToken = data.UsrToken;
         chat.lastMessage = data.message;
         chat.lastDate = data.date;
+        if(typeof(data.timeZoneOffset) != "undefined"){
+          chat.timeZoneOffset = data.timeZoneOffset;
+        }
         chat.channel = data.channel;
         //console.log("Do we need to add +1 to badge?" + JSON.stringify(chatAsJSON));
         if(nbUnreadMessage == 0){
@@ -368,6 +443,10 @@ class ChatList extends Component {
 
               if(typeof(currentData.share) != "undefined"){
                 reb.share = true;
+              }
+
+              if(typeof(currentData.timeZoneOffset) != "undefined"){
+                reb.timeZoneOffset = currentData.timeZoneOffset;
               }
 
               let rebAsString = JSON.stringify(reb);
@@ -650,7 +729,16 @@ class ChatList extends Component {
     if(rebChat.lastDate !== ""){
       var sendDate = new Date(0);
       console.log("rebChat: "+ rebChat.lastDate);
-      sendDate.setUTCSeconds(rebChat.lastDate/1000);
+      var lastDate = rebChat.lastDate;
+      if(typeof(rebChat.timeZoneOffset) != "undefined"){
+        var timeZoneOffset = rebChat.timeZoneOffset * 60 * 1000;
+        lastDate += timeZoneOffset;
+        var localTimeZoneOffset = new Date().getTimezoneOffset();
+        localTimeZoneOffset = localTimeZoneOffset * 60 * 1000;
+        lastDate += -1 * localTimeZoneOffset;
+      }
+
+      sendDate.setUTCSeconds(lastDate/1000);
       var sendHours = sendDate.getHours();
       sendHours = ("0" + sendHours).slice(-2);
       var sendMinutes = sendDate.getMinutes();
@@ -667,7 +755,7 @@ class ChatList extends Component {
       }else{
         var months = ['Jan.','Feb.','March','Apr.','May','June','July','Aug.','Sept.','Oct.','Nov.','Dec.'];
         var month = months[ sendDate.getMonth() ];
-        sendDateAsString = sendDate.getDate() + ' ' + month + (now.getFullYear() === sendDate.getFullYear() ? '' : sendDate.getFullYear());
+        sendDateAsString = sendDate.getDate() + ' ' + month + (now.getFullYear() === sendDate.getFullYear() ? '' : ' ' + sendDate.getFullYear());
       }
     }
 

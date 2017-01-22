@@ -183,7 +183,7 @@ class RebChat extends Component {
 
   tweet(reb) {
     KDSocialShare.tweet({
-        'text':reb,
+        'text':reb + ' #rebby',
         'link':'',
         'imagelink':'',
       },
@@ -195,7 +195,7 @@ class RebChat extends Component {
 
   shareOnFacebook(reb) {
     KDSocialShare.shareOnFacebook({
-        'text':reb,
+        'text':reb + ' #rebby',
         'link':'',
         'imagelink':'',
       },
@@ -225,8 +225,17 @@ class RebChat extends Component {
 
     var msg = JSON.parse(message);
 
+    var date = msg.date;
+    if(typeof(msg.timeZoneOffset) != "undefined"){
+      var timeZoneOffset = msg.timeZoneOffset * 60 * 1000;
+      date += timeZoneOffset;
+      var localTimeZoneOffset = new Date().getTimezoneOffset();
+      localTimeZoneOffset = localTimeZoneOffset * 60 * 1000;
+      date += -1 * localTimeZoneOffset;
+    }
+
     var sendDate = new Date(0);
-    sendDate.setUTCSeconds(msg.date/1000);
+    sendDate.setUTCSeconds(date/1000);
     var sendHours = sendDate.getHours();
     sendHours = ("0" + sendHours).slice(-2);
     var sendMinutes = sendDate.getMinutes();
@@ -254,7 +263,7 @@ class RebChat extends Component {
     }
 
     var sendTime = sendHours + ':' + sendMinutes;
-    this.previousSendDate = msg.date/1000;
+    this.previousSendDate = date/1000;
 
     if(msg.in !== null && msg.in == true){
       var reb = msg.rebus.replace(/ /g, "\u2000");
@@ -264,9 +273,6 @@ class RebChat extends Component {
           <View style={{flex:1, flexDirection: 'row',justifyContent:'flex-start'}}>
             <View style={{flex:1, flexDirection: 'column',}}>
               <Text style={Platform.OS === 'android'? styles.leftRebusAndroid : styles.leftRebus}>{msg.rebus.replace(/ /g, "\u2000")}</Text>
-              <View style={{alignSelf: 'stretch', backgroundColor: '#f4f4f4', marginRight: 5, marginLeft: 20}}>
-                <Text style={{alignSelf: 'flex-end'}}>{sendTime}</Text>
-              </View>
               {typeof(msg.share) != "undefined"  &&
               <View style={{marginLeft: 20, marginRight: 5}}>
                 <ScrollView>
@@ -290,7 +296,9 @@ class RebChat extends Component {
                 </ScrollView>
               </View>
               }
-
+              <View style={{alignSelf: 'stretch', backgroundColor: '#f4f4f4', marginRight: 5, marginLeft: 20}}>
+                <Text style={{alignSelf: 'flex-end'}}>{sendTime}</Text>
+              </View>
               <View style={styles.triangleLeftCorner} />
             </View>
             <View style={{width:60}}/>
@@ -441,7 +449,8 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginRight: 5,
     color: 'black',
-    borderRadius: 15,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
     paddingLeft: 14,
     paddingRight: 5,
     paddingBottom: 10,
@@ -456,7 +465,8 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginRight: 5,
     color: 'black',
-    borderRadius: 15,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
     paddingLeft: 14,
     paddingRight: 5,
     paddingBottom: 10,
@@ -472,7 +482,8 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginRight: 20,
     color: 'black',
-    borderRadius: 15,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
     paddingLeft: 5,
     paddingRight: 14,
     paddingBottom: 10,
@@ -487,7 +498,8 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginRight: 20,
     color: 'black',
-    borderRadius: 15,
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
     paddingLeft: 5,
     paddingRight: 14,
     paddingBottom: 10,

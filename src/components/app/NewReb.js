@@ -68,7 +68,7 @@ class NewReb extends Component {
 
   tweet() {
     KDSocialShare.tweet({
-        'text':this.state.rebus,
+        'text':this.state.rebus + ' #rebby',
         'link':'',
         'imagelink':'',
       },
@@ -89,7 +89,7 @@ class NewReb extends Component {
 
   shareOnFacebook() {
     KDSocialShare.shareOnFacebook({
-        'text':this.state.rebus,
+        'text':this.state.rebus + ' #rebby',
         'link':'',
         'imagelink':'',
       },
